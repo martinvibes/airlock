@@ -1,0 +1,257 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--ink);
+      overflow: hidden;
+      color: var(--plaster);
+    }
+    #mx-title {
+      position: absolute;
+      left: 130px;
+      top: 100px;
+      font-family: var(--font-display);
+      font-size: 100px;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .mx-label {
+      position: absolute;
+      top: 236px;
+      font-size: 44px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .mx-label i {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+    #mx-lk {
+      left: 160px;
+    }
+    #mx-lk i {
+      background: var(--clay);
+    }
+    #mx-lp {
+      left: 1040px;
+    }
+    #mx-lp i {
+      background: #3f9e9b;
+    }
+    .mx-grid {
+      position: absolute;
+      top: 310px;
+      width: 720px;
+      height: 600px;
+    }
+    #mx-gk {
+      left: 160px;
+      z-index: 2;
+    }
+    #mx-gp {
+      left: 1040px;
+    }
+    .mx-dot {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+    }
+    #mx-gk .mx-dot {
+      background: var(--clay);
+    }
+    #mx-gp .mx-dot {
+      background: #3f9e9b;
+    }
+    .mx-say {
+      position: absolute;
+      left: 160px;
+      top: 950px;
+      font-size: 54px;
+      font-weight: 700;
+    }
+    .mx-doc {
+      position: absolute;
+      top: 430px;
+      width: 640px;
+      background: var(--paper);
+      color: var(--ink);
+      border: 3px solid var(--plaster);
+      border-radius: 10px;
+      padding: 30px 36px;
+      box-shadow: 0 10px 0 rgba(0, 0, 0, 0.35);
+    }
+    .mx-doc b {
+      display: block;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 32px;
+    }
+    .mx-doc span {
+      display: block;
+      font-size: 36px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    #mx-dk {
+      left: 200px;
+    }
+    #mx-dp {
+      left: 1080px;
+    }
+    #mx-count {
+      position: absolute;
+      left: 130px;
+      top: 420px;
+    }
+    #mx-reel {
+      font-family: var(--font-display);
+      font-size: 150px;
+      line-height: 150px;
+      height: 150px;
+      overflow: hidden;
+      color: var(--plaster);
+    }
+    #mx-count span {
+      display: block;
+      font-size: 44px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+    #mx-37 {
+      position: absolute;
+      left: 110px;
+      top: 190px;
+      font-family: var(--font-display);
+      font-size: 420px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: var(--resin);
+    }
+    #mx-stuck {
+      position: absolute;
+      left: 790px;
+      top: 300px;
+      font-family: var(--font-display);
+      font-size: 130px;
+      line-height: 1;
+    }
+    .mx-line {
+      position: absolute;
+      left: 796px;
+      font-size: 64px;
+      font-weight: 700;
+    }
+    #mx-l1 {
+      top: 520px;
+    }
+    #mx-l2 {
+      top: 610px;
+    }
+    #mx-plaster {
+      position: absolute;
+      inset: 0;
+      background: var(--plaster);
+      z-index: 9;
+    }
+  </style>
+  <div id="root" data-composition-id="match" data-width="1920" data-height="1080">
+    <div id="mx-title">How many are really stuck?</div>
+    <div id="mx-lk" class="mx-label"><i></i>KudiMart · 443 credited orders</div>
+    <div id="mx-lp" class="mx-label"><i></i>Paylane · 480 payments</div>
+    <div id="mx-gp" class="mx-grid"></div>
+    <div id="mx-gk" class="mx-grid"></div>
+    <div id="mx-say1" class="mx-say">Each side blinds its list with its own secret key.</div>
+    <div id="mx-say2" class="mx-say">They travel as Switch room documents, not chat.</div>
+    <div id="mx-dk" class="mx-doc"><b>psi-run-2-round2-7de140</b><span>KudiMart · round 2 · 470 KB</span></div>
+    <div id="mx-dp" class="mx-doc"><b>psi-run-2-round1-6cf524</b><span>Paylane · round 1 · 250 KB</span></div>
+    <div id="mx-count"><div id="mx-reel"></div><span>matched</span></div>
+    <div id="mx-37">37</div>
+    <div id="mx-stuck">stuck.</div>
+    <div id="mx-l1" class="mx-line">Only the count crosses.</div>
+    <div id="mx-l2" class="mx-line">The list stays with Paylane.</div>
+    <div id="mx-plaster" data-layout-ignore></div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const gk = document.querySelector("#mx-gk"), gp = document.querySelector("#mx-gp");
+      // 37 stuck slots, picked by a seeded PRNG so every render is the same
+      const rnd = AK.rng(37480);
+      const stuck = new Set();
+      while (stuck.size < 37) stuck.add(Math.floor(rnd() * 480));
+      const kd = [], pd = [], pairs = [], left = [];
+      if (!gp.children.length) {
+        for (let i = 0; i < 480; i++) {
+          const c = i % 24, r = Math.floor(i / 24);
+          const p = document.createElement("div");
+          p.className = "mx-dot";
+          p.style.left = c * 30 + 6 + "px";
+          p.style.top = r * 30 + 6 + "px";
+          gp.appendChild(p);
+          if (!stuck.has(i)) {
+            const k = p.cloneNode();
+            gk.appendChild(k);
+          }
+        }
+      }
+      let ki = 0;
+      [...gp.children].forEach((p, i) => {
+        pd.push(p);
+        if (stuck.has(i)) left.push({ el: p, i });
+        else { const k = gk.children[ki++]; kd.push(k); pairs.push(k, p); }
+      });
+      const reel = AK.reel("#mx-reel", 0, 443);
+
+      ["#mx-dk", "#mx-dp", "#mx-say1", "#mx-say2", "#mx-count", "#mx-37", "#mx-stuck", "#mx-l1", "#mx-l2"].forEach((s) => tl.set(s, { opacity: 0 }, 0));
+      tl.set("#mx-plaster", { yPercent: 100 }, 0);
+      AK.words(tl, "#mx-title", 0.2, 0.08);
+      AK.blurIn(tl, "#mx-lp", 1.6);
+      tl.fromTo(pd, { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)", stagger: 0.0012 }, 1.8);
+      AK.blurIn(tl, "#mx-lk", 2.4);
+      tl.fromTo(kd, { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)", stagger: 0.0013 }, 2.6);
+      // blinded: every dot turns into a diamond, sweeping left to right
+      AK.out(tl, "#mx-title", 3.8, 0.18);
+      tl.to("#mx-say1", { opacity: 1, duration: 0.01 }, 3.9);
+      AK.words(tl, "#mx-say1", 3.9, 0.07);
+      const blind = (els) => tl.to(els, { borderRadius: "3px", rotation: 45, scale: 0.85, duration: 0.3, ease: "power2.inOut",
+        stagger: { grid: [20, 24], axis: "x", from: "start", amount: 1.0 } }, 4.4);
+      blind(pd);
+      tl.to(kd, { borderRadius: "3px", rotation: 45, scale: 0.85, duration: 0.3, ease: "power2.inOut", stagger: { amount: 1.0 } }, 4.4);
+      // shared as room documents
+      AK.out(tl, "#mx-say1", 6.45, 0.15);
+      tl.to(["#mx-gk", "#mx-gp", "#mx-lk", "#mx-lp"], { scale: 0.3, opacity: 0, duration: 0.4, ease: "power3.in" }, 6.5);
+      AK.pop(tl, ["#mx-dk", "#mx-dp"], 6.85, 0.12);
+      tl.to("#mx-say2", { opacity: 1, duration: 0.01 }, 6.7);
+      AK.words(tl, "#mx-say2", 6.7, 0.07);
+      // the match: both blinded lists on top of each other, pairs cancel
+      AK.out(tl, ["#mx-dk", "#mx-dp", "#mx-say2"], 9.0, 0.2);
+      tl.fromTo("#mx-gp", { x: -440, scale: 0.3, opacity: 0 }, { x: -440, scale: 1, opacity: 1, duration: 0.5, ease: "expo.out", immediateRender: false }, 9.15);
+      tl.fromTo("#mx-gk", { x: 440, scale: 0.3, opacity: 0 }, { x: 440, scale: 1, opacity: 1, duration: 0.5, ease: "expo.out", immediateRender: false }, 9.15);
+      AK.blurIn(tl, "#mx-count", 9.4);
+      tl.to(pairs, { opacity: 0, scale: 0, duration: 0.2, ease: "power2.in", stagger: 1.9 / pairs.length }, 9.75);
+      AK.roll(tl, reel, 9.75, 2.05, "none");
+      // what is left: 37
+      tl.to(left.map((d) => d.el), { backgroundColor: "#c08a4a", scale: 1.5, rotation: 0, borderRadius: "50%", duration: 0.35, ease: "back.out(2)", stagger: 0.02 }, 11.9);
+      // they fly into the number as the music drops out (104.295 s)
+      left.forEach((d) => {
+        const c = d.i % 24, r = Math.floor(d.i / 24);
+        const px = 600 + c * 30 + 15, py = 310 + r * 30 + 15;
+        tl.to(d.el, { x: 400 - px, y: 450 - py, scale: 0.4, duration: 0.42, ease: "power3.in" }, 13.55);
+      });
+      tl.to(["#mx-gp", "#mx-count"], { opacity: 0, duration: 0.15 }, 13.9);
+      tl.fromTo("#mx-37", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.45, ease: "expo.out", immediateRender: false }, 13.97);
+      AK.blurIn(tl, "#mx-stuck", 14.6);
+      tl.to("#mx-l1", { opacity: 1, duration: 0.01 }, 15.4);
+      AK.words(tl, "#mx-l1", 15.4, 0.08);
+      tl.to("#mx-l2", { opacity: 1, duration: 0.01 }, 16.5);
+      AK.words(tl, "#mx-l2", 16.5, 0.08);
+      tl.to("#mx-plaster", { yPercent: 0, duration: 0.45, ease: "power2.inOut" }, 18.1);
+      window.__timelines["match"] = tl;
+    })();
+  </script>
+</template>

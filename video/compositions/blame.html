@@ -1,0 +1,156 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--plaster);
+      overflow: hidden;
+    }
+    .blame-half {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 960px;
+      color: var(--plaster);
+      padding: 110px 110px 0;
+    }
+    #blame-left {
+      left: 0;
+      background: var(--clay);
+    }
+    #blame-right {
+      left: 960px;
+      background: var(--teal);
+    }
+    .blame-who {
+      font-family: var(--font-display);
+      font-size: 64px;
+      letter-spacing: -0.01em;
+    }
+    .blame-num {
+      font-family: var(--font-display);
+      font-size: 330px;
+      line-height: 300px;
+      height: 300px;
+      overflow: hidden;
+      letter-spacing: -0.03em;
+      margin-top: 50px;
+    }
+    .blame-what {
+      font-size: 56px;
+      font-weight: 600;
+      margin-top: 18px;
+    }
+    .blame-bubble {
+      position: absolute;
+      top: 770px;
+      background: var(--paper);
+      color: var(--ink);
+      border: 3px solid var(--ink);
+      border-radius: 28px;
+      border-bottom-left-radius: 6px;
+      box-shadow: var(--shadow);
+      padding: 30px 44px;
+      font-size: 50px;
+      font-weight: 700;
+      white-space: nowrap;
+      transform-origin: 0 100%;
+    }
+    #blame-b1,
+    #blame-b3 {
+      left: 110px;
+    }
+    #blame-b2,
+    #blame-b4 {
+      left: 1070px;
+    }
+    #blame-card {
+      position: absolute;
+      left: 260px;
+      top: 300px;
+      width: 1400px;
+      height: 480px;
+      background: var(--plaster);
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+    .blame-say {
+      position: absolute;
+      left: 360px;
+      top: 410px;
+      width: 1200px;
+      font-family: var(--font-display);
+      font-size: 120px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    #blame-say3 {
+      top: 380px;
+      font-size: 104px;
+    }
+    #blame-say3 .n {
+      color: var(--resin);
+    }
+    #blame-say3 small {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 56px;
+      font-weight: 600;
+      letter-spacing: 0;
+      margin-top: 26px;
+    }
+  </style>
+  <div id="root" data-composition-id="blame" data-width="1920" data-height="1080">
+    <div id="blame-left" class="blame-half">
+      <div class="blame-who">KudiMart</div>
+      <div class="blame-num" id="blame-n97"></div>
+      <div class="blame-what">orders stuck on pending</div>
+    </div>
+    <div id="blame-right" class="blame-half">
+      <div class="blame-who">Paylane</div>
+      <div class="blame-num" id="blame-n42"></div>
+      <div class="blame-what">webhooks gave up</div>
+    </div>
+    <div id="blame-b1" class="blame-bubble">Your webhooks never came.</div>
+    <div id="blame-b2" class="blame-bubble">We sent every one.</div>
+    <div id="blame-b3" class="blame-bubble">It's your bug.</div>
+    <div id="blame-b4" class="blame-bubble">It's your bug.</div>
+    <div id="blame-card" data-layout-allow-occlusion></div>
+    <div id="blame-say1" class="blame-say" data-layout-allow-overlap>Who's right?</div>
+    <div id="blame-say2" class="blame-say" data-layout-allow-overlap>Both. Each sees half.</div>
+    <div id="blame-say3" class="blame-say" data-layout-allow-overlap>The truth is <span class="n">37</span>.<small>Finding it takes both companies' records.</small></div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const r97 = AK.reel("#blame-n97", 0, 97);
+      const r42 = AK.reel("#blame-n42", 0, 42);
+      // whip in from the right, matching the hook's exit
+      tl.fromTo("#blame-left", { x: 1920, filter: "blur(18px)" }, { x: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.out" }, 0);
+      tl.fromTo("#blame-right", { x: 1920, filter: "blur(18px)" }, { x: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.out" }, 0.08);
+      AK.roll(tl, r97, 0.55, 0.9, "expo.out");
+      AK.roll(tl, r42, 0.65, 0.9, "expo.out");
+      // KudiMart speaks, then Paylane
+      AK.pop(tl, "#blame-b1", 1.7);
+      AK.pop(tl, "#blame-b2", 3.4);
+      AK.out(tl, "#blame-b1", 5.25, 0.15);
+      AK.out(tl, "#blame-b2", 5.25, 0.15);
+      AK.pop(tl, "#blame-b3", 5.4);
+      AK.pop(tl, "#blame-b4", 5.4);
+      // the card slams in over the fight
+      tl.to(["#blame-n97", "#blame-n42", "#blame-left .blame-what", "#blame-right .blame-what"], { opacity: 0, duration: 0.2 }, 6.95);
+      tl.fromTo("#blame-card", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power4.out" }, 7.0);
+      AK.words(tl, "#blame-say1", 7.15, 0.08);
+      AK.out(tl, "#blame-say1", 8.4, 0.15);
+      AK.words(tl, "#blame-say2", 8.6, 0.08);
+      AK.out(tl, "#blame-say2", 10.2, 0.15);
+      AK.words(tl, "#blame-say3", 10.4, 0.07);
+      // the card becomes the plaster world of the next shot
+      tl.to(["#blame-say3"], { opacity: 0, duration: 0.15, ease: "power2.in" }, 13.75);
+      tl.to("#blame-card", { scale: 4.2, borderWidth: 0, duration: 0.5, ease: "power2.inOut" }, 13.75);
+      window.__timelines["blame"] = tl;
+    })();
+  </script>
+</template>

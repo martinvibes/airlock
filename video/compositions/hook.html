@@ -1,0 +1,207 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--plaster);
+      overflow: hidden;
+    }
+    #hook-stage {
+      position: absolute;
+      inset: 0;
+    }
+    .hook-receipt {
+      position: absolute;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      color: var(--ink);
+    }
+    #hook-receipt {
+      left: 150px;
+      top: 150px;
+      width: 640px;
+      height: 780px;
+      padding: 56px;
+      transform-origin: 0 0;
+    }
+    .hook-receipt .hole {
+      position: absolute;
+      left: 50%;
+      top: 22px;
+      width: 18px;
+      height: 18px;
+      margin-left: -9px;
+      border-radius: 50%;
+      background: var(--plaster);
+      border: 3px solid var(--ink);
+    }
+    #hook-receipt .shop {
+      font-family: var(--font-display);
+      font-size: 60px;
+      color: var(--clay);
+      letter-spacing: -0.02em;
+      margin-top: 18px;
+    }
+    #hook-receipt .order {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 36px;
+      margin-top: 18px;
+    }
+    #hook-receipt .rule {
+      border-top: 3px dashed rgba(62, 36, 21, 0.45);
+      margin: 40px 0 34px;
+    }
+    #hook-receipt .row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 40px;
+      font-weight: 600;
+      margin-bottom: 26px;
+    }
+    #hook-receipt .row span:last-child {
+      font-weight: 700;
+    }
+    .hook-stamp {
+      position: absolute;
+      font-family: var(--font-display);
+      letter-spacing: 0.08em;
+      padding: 14px 34px 10px;
+      border: 7px double currentColor;
+      border-radius: 14px;
+    }
+    #hook-paid {
+      left: 92px;
+      top: 470px;
+      font-size: 92px;
+      color: var(--green);
+    }
+    #hook-pending {
+      left: 150px;
+      top: 600px;
+      font-size: 78px;
+      color: var(--clay);
+    }
+    #hook-line1 {
+      position: absolute;
+      left: 850px;
+      top: 230px;
+      width: 1040px;
+      font-family: var(--font-display);
+      font-size: 132px;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    #hook-line1 .n {
+      color: var(--resin);
+    }
+    #hook-line2 {
+      position: absolute;
+      left: 856px;
+      top: 600px;
+      width: 960px;
+      font-size: 64px;
+      font-weight: 600;
+      line-height: 1.15;
+    }
+    #hook-grid {
+      position: absolute;
+      left: 276px;
+      top: 67px;
+      width: 1368px;
+      height: 946px;
+    }
+    .hook-mini {
+      position: absolute;
+      width: 150px;
+      height: 170px;
+    }
+    .hook-mini i {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      height: 10px;
+      border-radius: 5px;
+      background: rgba(62, 36, 21, 0.25);
+    }
+    .hook-mini b {
+      position: absolute;
+      left: 8px;
+      top: 96px;
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 20px;
+      letter-spacing: 0.06em;
+      color: var(--clay);
+      border: 3px double var(--clay);
+      border-radius: 6px;
+      padding: 4px 8px 2px;
+      transform: rotate(6deg);
+    }
+    #hook-count {
+      position: absolute;
+      left: 1440px;
+      top: 815px;
+      font-family: var(--font-display);
+      font-size: 120px;
+      line-height: 1;
+      color: var(--resin);
+    }
+  </style>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080">
+    <div id="hook-stage">
+      <div id="hook-grid" data-layout-ignore></div>
+      <div id="hook-receipt" class="hook-receipt">
+        <div class="hole"></div>
+        <div class="shop">KudiMart</div>
+        <div class="order">Order KM-100139</div>
+        <div class="rule"></div>
+        <div class="row"><span>Paid with</span><span>Paylane</span></div>
+        <div class="row"><span>Amount</span><span>₦15,070</span></div>
+        <div class="row"><span>Status</span><span>?</span></div>
+        <div id="hook-paid" class="hook-stamp">PAID</div>
+        <div id="hook-pending" class="hook-stamp">PENDING</div>
+      </div>
+      <div id="hook-line1"><span class="n">37</span> customers paid.</div>
+      <div id="hook-line2">Their orders never arrived.</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // 36 more receipts in an 8 x 5 grid (the big one shrinks into cell 0)
+      const grid = document.querySelector("#hook-grid");
+      if (!grid.children.length) {
+        for (let i = 0; i < 37; i++) {
+          const c = i % 8, r = Math.floor(i / 8);
+          const d = document.createElement("div");
+          d.className = "hook-receipt hook-mini";
+          d.style.left = c * 174 + "px";
+          d.style.top = r * 194 + "px";
+          d.innerHTML = '<i style="top:30px"></i><i style="top:56px;right:50px"></i><b>PENDING</b>';
+          grid.appendChild(d);
+        }
+      }
+      const minis = grid.querySelectorAll(".hook-mini");
+
+      AK.stamp(tl, "#hook-paid", 0.3, -8);
+      AK.shake(tl, "#hook-receipt", 0.46);
+      AK.words(tl, "#hook-line1", 0.62, 0.09);
+      AK.stamp(tl, "#hook-pending", 1.45, 6);
+      AK.shake(tl, "#hook-receipt", 1.61);
+      AK.words(tl, "#hook-line2", 2.3);
+      // 4.75: text clears, the receipt becomes one of 37
+      AK.out(tl, "#hook-line1", 4.75);
+      AK.out(tl, "#hook-line2", 4.8);
+      tl.to("#hook-receipt", { x: 126, y: -83, scale: 0.2344, duration: 0.5, ease: "power3.inOut" }, 4.8);
+      tl.set("#hook-receipt", { opacity: 0 }, 5.3);
+      tl.fromTo(minis, { opacity: 0, scale: 0.3 },
+        { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)", stagger: 0.022 }, 5.05);
+      // 6.75: whip left into the blame split
+      tl.to("#hook-stage", { x: -1920, filter: "blur(18px)", duration: 0.36, ease: "power3.in" }, 6.78);
+      window.__timelines["hook"] = tl;
+    })();
+  </script>
+</template>

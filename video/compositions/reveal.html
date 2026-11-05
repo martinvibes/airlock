@@ -1,0 +1,113 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--plaster);
+      overflow: hidden;
+    }
+    .rv-half {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 960px;
+      color: var(--plaster);
+      padding: 90px 110px;
+      font-family: var(--font-display);
+      font-size: 64px;
+    }
+    #rv-left {
+      left: 0;
+      background: var(--clay);
+    }
+    #rv-right {
+      left: 960px;
+      background: var(--teal);
+      text-align: right;
+    }
+    #rv-wall {
+      position: absolute;
+      left: 880px;
+      top: 0;
+      width: 160px;
+      height: 1080px;
+      background: repeating-linear-gradient(90deg, #5c3a21 0 30px, #4f311b 30px 32px);
+      border-left: 6px solid #3e2415;
+      border-right: 6px solid #3e2415;
+    }
+    #rv-say0 {
+      position: absolute;
+      left: 110px;
+      top: 860px;
+      font-size: 64px;
+      font-weight: 700;
+      color: var(--plaster);
+    }
+    #rv-door {
+      position: absolute;
+      left: 780px;
+      top: 334px;
+      width: 360px;
+      height: 412px;
+    }
+    #rv-word {
+      position: absolute;
+      left: 700px;
+      top: 300px;
+      font-family: var(--font-display);
+      font-size: 200px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+    .rv-tag {
+      position: absolute;
+      left: 708px;
+      font-size: 54px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    #rv-tag1 {
+      top: 560px;
+    }
+    #rv-tag2 {
+      top: 636px;
+    }
+  </style>
+  <div id="root" data-composition-id="reveal" data-width="1920" data-height="1080">
+    <div id="rv-left" class="rv-half">KudiMart</div>
+    <div id="rv-right" class="rv-half">Paylane</div>
+    <div id="rv-wall"></div>
+    <div id="rv-say0" data-layout-ignore>Nothing gets through.</div>
+    <div id="rv-word">Airlock</div>
+    <div id="rv-tag1" class="rv-tag">Two companies fix one incident in chat.</div>
+    <div id="rv-tag2" class="rv-tag">Only typed claims cross between them.</div>
+    <svg id="rv-door" viewBox="22 22 84 96">
+      <path d="M30 112 V58 A34 34 0 0 1 98 58 V112 Z" fill="#5C3A21" stroke="#3E2415" stroke-width="1.5" />
+      <rect x="62" y="26" width="4" height="86" fill="#F4ECE1" />
+      <circle cx="55" cy="76" r="4" fill="#C08A4A" />
+      <circle cx="73" cy="76" r="4" fill="#C08A4A" />
+      <rect x="22" y="110" width="84" height="6" rx="3" fill="#3E2415" />
+    </svg>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // the wall grows a door
+      tl.fromTo("#rv-door", { opacity: 0, scale: 0.25, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.5)" }, 0.12);
+      AK.out(tl, "#rv-say0", 0.1, 0.15);
+      // the companies and the wall clear; the door stays and steps left
+      tl.to("#rv-left", { x: -960, duration: 0.45, ease: "power3.in" }, 1.25);
+      tl.to("#rv-right", { x: 960, duration: 0.45, ease: "power3.in" }, 1.25);
+      tl.to("#rv-wall", { scaleY: 0, transformOrigin: "50% 0%", duration: 0.4, ease: "power3.in" }, 1.25);
+      tl.to("#rv-door", { x: -500, duration: 0.6, ease: "power2.inOut" }, 1.55);
+      tl.fromTo("#rv-word", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.55, ease: "expo.out" }, 2.0);
+      AK.words(tl, "#rv-tag1", 2.9);
+      AK.words(tl, "#rv-tag2", 4.0);
+      // hand off: the door shrinks into its place in the room plan
+      AK.out(tl, ["#rv-word", "#rv-tag1", "#rv-tag2"], 6.45, 0.18);
+      tl.to("#rv-door", { x: -176, y: -31, scale: 0.3333, duration: 0.55, ease: "power2.inOut" }, 6.5);
+      window.__timelines["reveal"] = tl;
+    })();
+  </script>
+</template>

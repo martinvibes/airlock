@@ -1,0 +1,208 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--plaster);
+      overflow: hidden;
+    }
+    .bx {
+      position: absolute;
+      top: 330px;
+      width: 600px;
+      height: 360px;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 36px 44px;
+      color: var(--ink);
+    }
+    .bx h3 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 54px;
+      line-height: 1.1;
+    }
+    .bx .m {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 34px;
+      margin-top: 14px;
+    }
+    .bx .big {
+      font-size: 44px;
+      font-weight: 700;
+      margin-top: 26px;
+    }
+    .bxk {
+      left: 120px;
+      border-left: 16px solid var(--clay);
+    }
+    .bxk h3 {
+      color: var(--clay);
+    }
+    .bxp {
+      left: 1200px;
+      border-left: 16px solid var(--teal);
+    }
+    .bxp h3 {
+      color: var(--teal);
+    }
+    .vreel {
+      display: inline-block;
+      vertical-align: top;
+      height: 52px;
+      line-height: 52px;
+      overflow: hidden;
+    }
+    .sg {
+      position: absolute;
+      top: 120px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+    .sg .av {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 52px;
+      font-weight: 600;
+      border: 4px solid var(--plaster);
+    }
+    .sg .bub {
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 26px;
+      border-top-left-radius: 6px;
+      box-shadow: var(--shadow);
+      padding: 18px 30px;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 40px;
+    }
+    .sgk {
+      left: 120px;
+    }
+    .sgk .av {
+      background: #c5087e;
+    }
+    .sgp {
+      left: 1200px;
+    }
+    .sgp .av {
+      background: #d32f2f;
+    }
+    .tk {
+      position: absolute;
+      width: 70px;
+      height: 44px;
+      background: var(--paper);
+      border: 3px solid var(--resin);
+      border-radius: 6px;
+    }
+    .say {
+      position: absolute;
+      left: 120px;
+      top: 860px;
+      font-size: 58px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .stampx {
+      position: absolute;
+      font-family: var(--font-display);
+      letter-spacing: 0.08em;
+      border: 8px double currentColor;
+      border-radius: 16px;
+      padding: 10px 34px 4px;
+    }
+
+    #rp-401 {
+      left: 220px;
+      top: 430px;
+      font-size: 150px;
+      color: var(--crimson);
+      z-index: 5;
+    }
+    #rp-inv {
+      position: absolute;
+      left: 640px;
+      top: 270px;
+      width: 130px;
+      height: 130px;
+      z-index: 6;
+    }
+    #rp-rej {
+      position: absolute;
+      left: 230px;
+      top: 720px;
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--crimson);
+    }
+  </style>
+  <div id="root" data-composition-id="replay" data-width="1920" data-height="1080">
+    <div id="rp-k" class="bx bxk"><h3>KudiMart<br />canary pod</h3><div class="m">verifier <span class="vreel" data-layout-allow-overflow><span id="rp-ver" style="display:block" data-layout-ignore><span style="display:block">v2.14.0</span><span style="display:block">v2.14.1</span></span></span></div></div>
+    <div id="rp-p" class="bx bxp"><h3>Paylane</h3><div class="big">37 webhooks<br />to replay</div></div>
+    <div id="rp-sk" class="sg sgk"><div class="av">K</div><div class="bub">sign replay-1</div></div>
+    <div id="rp-sp" class="sg sgp"><div class="av">P</div><div class="bub">sign replay-1</div></div>
+    <div id="rp-tks"></div>
+
+    <div id="rp-401" class="stampx" data-layout-allow-occlusion data-layout-allow-overlap>401</div>
+    <div id="rp-rej">37 rejected</div>
+    <div id="rp-say1" class="say">Replays need both engineers to sign.</div>
+    <div id="rp-say2" class="say">The canary still checks only X-Sig-Primary.</div>
+    <div id="rp-say3" class="say">KudiMart ships v2.14.1: it accepts either header.</div>
+    <div id="rp-say4" class="say">Its investigator checks the fix in KudiMart's own files.</div>
+    <svg id="rp-inv" viewBox="0 0 100 100"><rect x="18" y="18" width="64" height="64" rx="16" transform="rotate(45 50 50)" fill="#9bd78d"/><circle cx="39" cy="50" r="6" fill="#0f172a"/><circle cx="61" cy="50" r="6" fill="#0f172a"/></svg>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const host = document.querySelector("#rp-tks");
+      if (!host.children.length) {
+        for (let i = 0; i < 37; i++) {
+          const t = document.createElement("div");
+          t.className = "tk";
+          t.style.left = 1300 + (i % 6) * 76 + "px";
+          t.style.top = 520 + Math.floor(i / 6) * 22 + "px";
+          host.appendChild(t);
+        }
+      }
+      const tks = [...host.children];
+
+      const rnd = AK.rng(401);
+      AK.pop(tl, "#rp-k", 0.15);
+      AK.pop(tl, "#rp-p", 0.25);
+      AK.pop(tl, "#rp-sk", 0.7);
+      AK.pop(tl, "#rp-sp", 1.3);
+      AK.words(tl, "#rp-say1", 1.9, 0.08);
+      // 37 webhooks fly at the canary and bounce
+      tl.fromTo(tks, { opacity: 0 }, { opacity: 1, duration: 0.1, stagger: 0.025 }, 2.1);
+      tks.forEach((t, i) => {
+        const s = 2.2 + i * 0.025;
+        tl.to(t, { x: -560 - (i % 6) * 76, duration: 0.42, ease: "power2.in" }, s);
+        tl.to(t, { borderColor: "#c8102e", backgroundColor: "#f7d9dd", duration: 0.05 }, s + 0.42);
+        tl.to(t, { x: -360 - (i % 6) * 76 + rnd() * 120, y: 260 + rnd() * 160, rotation: -60 + rnd() * 120, opacity: 0, duration: 0.6, ease: "power2.out" }, s + 0.44);
+      });
+      AK.stamp(tl, "#rp-401", 2.64, -8);
+      AK.pop(tl, "#rp-rej", 3.2);
+      AK.out(tl, "#rp-say1", 4.1, 0.15);
+      AK.words(tl, "#rp-say2", 4.3, 0.08);
+      // the fix ships
+      AK.out(tl, ["#rp-say2", "#rp-401", "#rp-rej"], 6.6, 0.18);
+      AK.words(tl, "#rp-say3", 6.7, 0.08);
+      tl.to("#rp-ver", { yPercent: -50, duration: 0.35, ease: "back.out(1.6)" }, 7.4);
+      tl.to("#rp-k", { borderLeftColor: "#2e7d32", duration: 0.3 }, 7.4);
+      AK.out(tl, "#rp-say3", 9.12, 0.15);
+      AK.pop(tl, "#rp-inv", 9.22);
+      AK.words(tl, "#rp-say4", 9.27, 0.06);
+      window.__timelines["replay"] = tl;
+    })();
+  </script>
+</template>

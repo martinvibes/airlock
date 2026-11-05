@@ -1,0 +1,147 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--plaster);
+      overflow: hidden;
+    }
+    #wall-stage {
+      position: absolute;
+      inset: 0;
+    }
+    #wall-title {
+      position: absolute;
+      left: 130px;
+      top: 110px;
+      font-family: var(--font-display);
+      font-size: 110px;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    #wall-sheet {
+      position: absolute;
+      left: 130px;
+      top: 300px;
+      width: 1660px;
+      height: 440px;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 34px 48px;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 34px;
+      line-height: 62px;
+      white-space: nowrap;
+    }
+    #wall-sheet .head {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 36px;
+      color: var(--teal);
+      margin-bottom: 8px;
+    }
+    #wall-sheet .row {
+      display: block;
+    }
+    .wall-pii {
+      border: 3px solid transparent;
+      border-radius: 6px;
+      padding: 0 4px;
+    }
+    #wall-say1,
+    #wall-say2 {
+      position: absolute;
+      left: 130px;
+      font-weight: 700;
+      font-size: 60px;
+    }
+    #wall-say1 {
+      top: 800px;
+    }
+    #wall-say2 {
+      top: 880px;
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 76px;
+    }
+    .wall-half {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 960px;
+      color: var(--plaster);
+      padding: 90px 110px;
+      font-family: var(--font-display);
+      font-size: 64px;
+    }
+    #wall-left {
+      left: 0;
+      background: var(--clay);
+    }
+    #wall-right {
+      left: 960px;
+      background: var(--teal);
+      text-align: right;
+    }
+    #wall-wall {
+      position: absolute;
+      left: 880px;
+      top: 0;
+      width: 160px;
+      height: 1080px;
+      background: repeating-linear-gradient(90deg, #5c3a21 0 30px, #4f311b 30px 32px);
+      border-left: 6px solid #3e2415;
+      border-right: 6px solid #3e2415;
+    }
+    #wall-say3 {
+      position: absolute;
+      left: 110px;
+      top: 860px;
+      font-size: 64px;
+      font-weight: 700;
+      color: var(--plaster);
+    }
+  </style>
+  <div id="root" data-composition-id="wall" data-width="1920" data-height="1080">
+    <div id="wall-stage">
+      <div id="wall-title">So why not share the logs?</div>
+      <div id="wall-sheet">
+        <div class="head">Paylane · payments.csv</div>
+        <span class="row"><span class="wall-pii">KDM-0D991B-0139</span>,1507000,success,<span class="wall-pii">+2348002766404</span>,<span class="wall-pii">9541</span>,gave_up</span>
+        <span class="row"><span class="wall-pii">KDM-8A3FAF-0140</span>,2056000,success,<span class="wall-pii">+2348001471351</span>,<span class="wall-pii">0316</span>,gave_up</span>
+        <span class="row"><span class="wall-pii">KDM-882E70-0001</span>,1540800,success,<span class="wall-pii">+2348008705261</span>,<span class="wall-pii">3687</span>,delivered</span>
+        <span class="row"><span class="wall-pii">KDM-AADD11-0002</span>,2183200,success,<span class="wall-pii">+2348005006443</span>,<span class="wall-pii">3757</span>,delivered</span>
+        <span class="row"><span class="wall-pii">KDM-49AAE6-0003</span>,1870650,success,<span class="wall-pii">+2348006889108</span>,<span class="wall-pii">4057</span>,delivered</span>
+      </div>
+      <div id="wall-say1">Payment refs. Phone numbers. Card digits.</div>
+      <div id="wall-say2">Customer data can't leave the building.</div>
+    </div>
+    <div id="wall-left" class="wall-half">KudiMart</div>
+    <div id="wall-right" class="wall-half">Paylane</div>
+    <div id="wall-wall"></div>
+    <div id="wall-say3">Nothing gets through.</div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      AK.words(tl, "#wall-title", 0.15, 0.08);
+      tl.fromTo("#wall-sheet", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.45, ease: "expo.out" }, 1.3);
+      tl.fromTo("#wall-sheet .row", { clipPath: "inset(0 100% 0 0)" },
+        { clipPath: "inset(0 0% 0 0)", duration: 0.3, ease: "none", stagger: 0.18 }, 1.5);
+      tl.to("#wall-sheet .wall-pii", { borderColor: "#c8102e", backgroundColor: "rgba(200,16,46,0.10)", duration: 0.12, stagger: 0.05 }, 3.0);
+      AK.words(tl, "#wall-say1", 3.1, 0.12);
+      AK.words(tl, "#wall-say2", 4.7, 0.08);
+      // clear, flood into the two companies, and the wall slams down
+      AK.out(tl, "#wall-stage", 6.55, 0.2);
+      tl.fromTo("#wall-left", { x: -960 }, { x: 0, duration: 0.42, ease: "power2.inOut" }, 6.6);
+      tl.fromTo("#wall-right", { x: 960 }, { x: 0, duration: 0.42, ease: "power2.inOut" }, 6.6);
+      tl.fromTo("#wall-wall", { y: -1120 }, { y: 0, duration: 0.24, ease: "power4.in" }, 7.28);
+      AK.shake(tl, ["#wall-left", "#wall-right"], 7.52, 10);
+      AK.words(tl, "#wall-say3", 7.9, 0.09);
+      window.__timelines["wall"] = tl;
+    })();
+  </script>
+</template>

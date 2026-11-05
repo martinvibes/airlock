@@ -1,0 +1,61 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(90deg, #5c3a21 0 46px, #553519 46px 48px);
+      overflow: hidden;
+      color: var(--plaster);
+    }
+    #ws-title {
+      position: absolute;
+      left: 130px;
+      top: 130px;
+      font-family: var(--font-display);
+      font-size: 150px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+    .ws-line {
+      position: absolute;
+      left: 136px;
+      display: flex;
+      align-items: baseline;
+      gap: 30px;
+      font-size: 76px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .ws-line i {
+      font-style: normal;
+      font-family: var(--font-display);
+      color: #e9c99f;
+      width: 70px;
+    }
+    #ws-l1 {
+      top: 420px;
+    }
+    #ws-l2 {
+      top: 570px;
+    }
+    #ws-l3 {
+      top: 720px;
+    }
+  </style>
+  <div id="root" data-composition-id="walls" data-width="1920" data-height="1080">
+    <div id="ws-title">The walls are Switch.</div>
+    <div id="ws-l1" class="ws-line"><span>Rooms that agents can't enter</span></div>
+    <div id="ws-l2" class="ws-line"><span>Senders it verifies</span></div>
+    <div id="ws-l3" class="ws-line"><span>Documents tied to a room</span></div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      AK.words(tl, "#ws-title", 0.15, 0.1);
+      AK.words(tl, "#ws-l1", 1.9, 0.07);
+      AK.words(tl, "#ws-l2", 3.3, 0.07);
+      AK.words(tl, "#ws-l3", 4.5, 0.07);
+      window.__timelines["walls"] = tl;
+    })();
+  </script>
+</template>

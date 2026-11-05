@@ -1,0 +1,115 @@
+    .bx {
+      position: absolute;
+      top: 330px;
+      width: 600px;
+      height: 360px;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 36px 44px;
+      color: var(--ink);
+    }
+    .bx h3 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 54px;
+      line-height: 1.1;
+    }
+    .bx .m {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 34px;
+      margin-top: 14px;
+    }
+    .bx .big {
+      font-size: 44px;
+      font-weight: 700;
+      margin-top: 26px;
+    }
+    .bxk {
+      left: 120px;
+      border-left: 16px solid var(--clay);
+    }
+    .bxk h3 {
+      color: var(--clay);
+    }
+    .bxp {
+      left: 1200px;
+      border-left: 16px solid var(--teal);
+    }
+    .bxp h3 {
+      color: var(--teal);
+    }
+    .vreel {
+      display: inline-block;
+      vertical-align: top;
+      height: 52px;
+      line-height: 52px;
+      overflow: hidden;
+    }
+    .sg {
+      position: absolute;
+      top: 120px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+    .sg .av {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 52px;
+      font-weight: 600;
+      border: 4px solid var(--plaster);
+    }
+    .sg .bub {
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 26px;
+      border-top-left-radius: 6px;
+      box-shadow: var(--shadow);
+      padding: 18px 30px;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 40px;
+    }
+    .sgk {
+      left: 120px;
+    }
+    .sgk .av {
+      background: #c5087e;
+    }
+    .sgp {
+      left: 1200px;
+    }
+    .sgp .av {
+      background: #d32f2f;
+    }
+    .tk {
+      position: absolute;
+      width: 70px;
+      height: 44px;
+      background: var(--paper);
+      border: 3px solid var(--resin);
+      border-radius: 6px;
+    }
+    .say {
+      position: absolute;
+      left: 120px;
+      top: 860px;
+      font-size: 58px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .stampx {
+      position: absolute;
+      font-family: var(--font-display);
+      letter-spacing: 0.08em;
+      border: 8px double currentColor;
+      border-radius: 16px;
+      padding: 10px 34px 4px;
+    }

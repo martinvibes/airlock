@@ -1,0 +1,82 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--plaster);
+      overflow: hidden;
+    }
+    #ec-door {
+      position: absolute;
+      left: 810px;
+      top: 290px;
+      width: 300px;
+      height: 343px;
+    }
+    #ec-word {
+      position: absolute;
+      left: 700px;
+      top: 330px;
+      font-family: var(--font-display);
+      font-size: 190px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+    #ec-url {
+      position: absolute;
+      left: 708px;
+      top: 560px;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 48px;
+      color: var(--ink);
+    }
+    #ec-built {
+      position: absolute;
+      left: 708px;
+      top: 640px;
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--wood);
+    }
+    #ec-credit {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 960px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 500;
+      color: rgba(62, 36, 21, 0.78);
+    }
+  </style>
+  <div id="root" data-composition-id="endcard" data-width="1920" data-height="1080">
+    <svg id="ec-door" viewBox="22 22 84 96">
+      <path d="M30 112 V58 A34 34 0 0 1 98 58 V112 Z" fill="#C08A4A" />
+      <g id="ec-leaf-l"><path d="M30 112 V58 A34 34 0 0 1 62 24.06 V112 Z" fill="#5C3A21" /><circle cx="55" cy="76" r="4" fill="#C08A4A" /></g>
+      <g id="ec-leaf-r"><path d="M66 24.06 A34 34 0 0 1 98 58 V112 H66 Z" fill="#5C3A21" /><circle cx="73" cy="76" r="4" fill="#C08A4A" /></g>
+      <rect x="22" y="110" width="84" height="6" rx="3" fill="#3E2415" />
+    </svg>
+    <div id="ec-word">Airlock</div>
+    <div id="ec-url">github.com/martinvibes/airlock</div>
+    <div id="ec-built">Built on Switch</div>
+    <div id="ec-credit">Music: “Funkorama” by Kevin MacLeod (incompetech.com), CC BY 3.0 · KudiMart and Paylane are fictional; all data is synthetic.</div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#ec-door", { opacity: 0, scale: 0.3, transformOrigin: "50% 100%" }, { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.5)" }, 0.15);
+      // the door opens: each leaf folds toward its hinge
+      tl.fromTo("#ec-leaf-l", { scaleX: 1, svgOrigin: "30 70" }, { scaleX: 0.18, duration: 0.55, ease: "power3.inOut" }, 1.0);
+      tl.fromTo("#ec-leaf-r", { scaleX: 1, svgOrigin: "98 70" }, { scaleX: 0.18, duration: 0.55, ease: "power3.inOut" }, 1.0);
+      // and steps aside for the name
+      tl.to("#ec-door", { x: -440, duration: 0.6, ease: "power2.inOut" }, 1.75);
+      tl.fromTo("#ec-word", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.55, ease: "expo.out" }, 2.2);
+      AK.blurIn(tl, "#ec-url", 3.0);
+      AK.blurIn(tl, "#ec-built", 3.6);
+      AK.blurIn(tl, "#ec-credit", 4.4);
+      window.__timelines["endcard"] = tl;
+    })();
+  </script>
+</template>

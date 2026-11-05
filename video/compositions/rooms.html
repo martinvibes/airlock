@@ -1,0 +1,272 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--plaster);
+      overflow: hidden;
+    }
+    #rooms-zoom {
+      position: absolute;
+      inset: 0;
+    }
+    #rooms-plan {
+      position: absolute;
+      left: 100px;
+      top: 110px;
+      width: 1720px;
+      height: 730px;
+      border: 24px solid var(--wood);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+    }
+    .rooms-floor {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      padding: 40px 0 0 44px;
+      color: var(--plaster);
+    }
+    #rooms-k {
+      left: 0;
+      width: 660px;
+      background: var(--clay);
+    }
+    #rooms-a {
+      left: 660px;
+      width: 352px;
+      background: #7a5234;
+    }
+    #rooms-p {
+      left: 1012px;
+      width: 660px;
+      background: var(--teal);
+    }
+    .rooms-wall {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 24px;
+      background: var(--wood);
+    }
+    #rooms-wall-k {
+      left: 648px;
+    }
+    #rooms-wall-p {
+      left: 1000px;
+    }
+    .rooms-title {
+      font-family: var(--font-display);
+      font-size: 46px;
+      letter-spacing: -0.01em;
+    }
+    .rooms-who {
+      position: absolute;
+      left: 44px;
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+    .rooms-who b {
+      display: block;
+      font-size: 42px;
+      font-weight: 700;
+    }
+    .rooms-who span {
+      display: block;
+      font-size: 31px;
+      font-weight: 500;
+      opacity: 0.92;
+    }
+    .av {
+      width: 110px;
+      height: 110px;
+      flex: none;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 60px;
+      color: #fff;
+      border: 4px solid var(--plaster);
+    }
+    .av.k {
+      background: #c5087e;
+    }
+    .av.p {
+      background: #d32f2f;
+    }
+    .av.inv {
+      border: none;
+      border-radius: 0;
+    }
+    .av.cus {
+      background: var(--plaster);
+    }
+    .av svg {
+      width: 100%;
+      height: 100%;
+    }
+    .av.small {
+      width: 86px;
+      height: 86px;
+      font-size: 46px;
+    }
+    /* doors sit across the shared walls */
+    .rooms-door {
+      position: absolute;
+      top: 300px;
+      width: 120px;
+      height: 150px;
+    }
+    #rooms-door-k {
+      left: 600px;
+    }
+    #rooms-door-p {
+      left: 952px;
+    }
+    #rooms-a-cast {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 190px;
+      text-align: center;
+    }
+    #rooms-a-cast .pair {
+      display: flex;
+      justify-content: center;
+      gap: 26px;
+      margin-bottom: 18px;
+    }
+    #rooms-a-cast span {
+      font-size: 31px;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+    #rooms-403 {
+      position: absolute;
+      left: 700px;
+      top: 560px;
+      background: var(--paper);
+      color: var(--ink);
+      border: 3px solid var(--crimson);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 22px 34px;
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 34px;
+      white-space: nowrap;
+    }
+    #rooms-403 b {
+      font-family: var(--font-display);
+      font-weight: 400;
+      color: var(--crimson);
+      font-size: 58px;
+      margin-right: 18px;
+      vertical-align: -6px;
+    }
+    #rooms-caption {
+      position: absolute;
+      left: 100px;
+      top: 900px;
+      font-size: 60px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+  </style>
+  <div id="root" data-composition-id="rooms" data-width="1920" data-height="1080">
+    <div id="rooms-zoom">
+    <div id="rooms-plan">
+      <div id="rooms-k" class="rooms-floor">
+        <div class="rooms-title">KudiMart war room</div>
+        <div class="rooms-who" id="rooms-k1" style="top: 150px">
+          <div class="av k">K</div>
+          <div><b>Engineer</b><span>a person</span></div>
+        </div>
+        <div class="rooms-who" id="rooms-k2" style="top: 320px">
+          <div class="av inv" id="rooms-inv-k">
+            <svg viewBox="0 0 100 100"><rect x="18" y="18" width="64" height="64" rx="16" transform="rotate(45 50 50)" fill="#9bd78d"/><circle cx="39" cy="50" r="6" fill="#0f172a"/><circle cx="61" cy="50" r="6" fill="#0f172a"/></svg>
+          </div>
+          <div><b>Investigator</b><span>Claude Code, own files only</span></div>
+        </div>
+        <div class="rooms-who" id="rooms-k3" style="top: 490px">
+          <div class="av cus">
+            <svg viewBox="0 0 128 128"><path d="M30 112 V58 A34 34 0 0 1 98 58 V112 Z" fill="#5C3A21"/><rect x="62" y="26" width="4" height="86" fill="#F4ECE1"/><circle cx="55" cy="76" r="4" fill="#C08A4A"/><circle cx="73" cy="76" r="4" fill="#C08A4A"/><rect x="22" y="110" width="84" height="6" rx="3" fill="#3E2415"/></svg>
+          </div>
+          <div><b>Customs</b><span>plain code, no AI</span></div>
+        </div>
+      </div>
+      <div id="rooms-a" class="rooms-floor">
+        <div class="rooms-title">airlock</div>
+        <div id="rooms-a-cast">
+          <div class="pair"><div class="av k small">K</div><div class="av p small">P</div></div>
+          <span>both engineers<br />both Customs</span>
+        </div>
+      </div>
+      <div id="rooms-p" class="rooms-floor" style="padding-left: 100px">
+        <div class="rooms-title">Paylane war room</div>
+        <div class="rooms-who rooms-pw" style="top: 150px; left: 100px">
+          <div class="av p">P</div>
+          <div><b>Engineer</b></div>
+        </div>
+        <div class="rooms-who rooms-pw" style="top: 320px; left: 100px">
+          <div class="av inv" id="rooms-inv-p">
+            <svg viewBox="0 0 100 100"><rect x="18" y="18" width="64" height="64" rx="16" transform="rotate(45 50 50)" fill="#9bd78d"/><circle cx="39" cy="50" r="6" fill="#0f172a"/><circle cx="61" cy="50" r="6" fill="#0f172a"/></svg>
+          </div>
+          <div><b>Investigator</b></div>
+        </div>
+        <div class="rooms-who rooms-pw" style="top: 490px; left: 100px">
+          <div class="av cus">
+            <svg viewBox="0 0 128 128"><path d="M30 112 V58 A34 34 0 0 1 98 58 V112 Z" fill="#5C3A21"/><rect x="62" y="26" width="4" height="86" fill="#F4ECE1"/><circle cx="55" cy="76" r="4" fill="#C08A4A"/><circle cx="73" cy="76" r="4" fill="#C08A4A"/><rect x="22" y="110" width="84" height="6" rx="3" fill="#3E2415"/></svg>
+          </div>
+          <div><b>Customs</b></div>
+        </div>
+      </div>
+      <div id="rooms-wall-k" class="rooms-wall"></div>
+      <div id="rooms-wall-p" class="rooms-wall"></div>
+      <svg id="rooms-door-k" class="rooms-door" viewBox="22 22 84 96"><path d="M30 112 V58 A34 34 0 0 1 98 58 V112 Z" fill="#5C3A21" stroke="#F4ECE1" stroke-width="3"/><rect x="62" y="26" width="4" height="86" fill="#F4ECE1"/><circle cx="55" cy="76" r="4" fill="#C08A4A"/><circle cx="73" cy="76" r="4" fill="#C08A4A"/><rect x="22" y="110" width="84" height="6" rx="3" fill="#3E2415"/></svg>
+      <svg id="rooms-door-p" class="rooms-door" viewBox="22 22 84 96"><path d="M30 112 V58 A34 34 0 0 1 98 58 V112 Z" fill="#5C3A21" stroke="#F4ECE1" stroke-width="3"/><rect x="62" y="26" width="4" height="86" fill="#F4ECE1"/><circle cx="55" cy="76" r="4" fill="#C08A4A"/><circle cx="73" cy="76" r="4" fill="#C08A4A"/><rect x="22" y="110" width="84" height="6" rx="3" fill="#3E2415"/></svg>
+      <div id="rooms-403" data-layout-allow-occlusion><b>403</b>Agent is not a member of this room</div>
+    </div>
+    <div id="rooms-caption">Switch enforces the walls on the server.</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // the plan builds around the door that came from the reveal
+      tl.fromTo("#rooms-plan", { borderColor: "rgba(92,58,33,0)", boxShadow: "0 10px 0 rgba(62,36,21,0)" },
+        { borderColor: "rgba(92,58,33,1)", boxShadow: "0 10px 0 rgba(62,36,21,0.28)", duration: 0.35, ease: "power2.out" }, 0.0);
+      tl.fromTo("#rooms-k", { scaleX: 0, transformOrigin: "100% 50%" }, { scaleX: 1, duration: 0.45, ease: "power2.inOut" }, 0.1);
+      tl.fromTo("#rooms-a", { scaleY: 0, transformOrigin: "50% 50%" }, { scaleY: 1, duration: 0.45, ease: "power2.inOut" }, 0.2);
+      tl.fromTo("#rooms-p", { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: 0.45, ease: "power2.inOut" }, 0.3);
+      tl.fromTo(".rooms-wall", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.3);
+      AK.pop(tl, "#rooms-door-p", 0.5);
+      AK.blurIn(tl, "#rooms-k .rooms-title", 0.75);
+      AK.blurIn(tl, "#rooms-a .rooms-title", 0.9);
+      AK.blurIn(tl, "#rooms-p .rooms-title", 1.05);
+      // the cast, one at a time
+      AK.pop(tl, "#rooms-k1", 1.5);
+      AK.pop(tl, "#rooms-k2", 2.6);
+      AK.pop(tl, "#rooms-k3", 3.7);
+      AK.pop(tl, "#rooms-a-cast", 4.8);
+      AK.pop(tl, ".rooms-pw", 5.8, 0.12);
+      // the investigator walks at airlock and bounces off
+      tl.fromTo("#rooms-inv-k", { x: 0, rotation: 0 }, { x: 430, duration: 0.55, ease: "power2.in" }, 7.0);
+      tl.to("#rooms-inv-k", { x: 170, rotation: -28, duration: 0.45, ease: "back.out(2)" }, 7.55);
+      tl.to("#rooms-inv-k", { x: 0, rotation: 0, duration: 0.5, ease: "power2.inOut" }, 8.1);
+      tl.fromTo("#rooms-403", { opacity: 0, scale: 1.5, rotation: -8 }, { opacity: 1, scale: 1, rotation: -3, duration: 0.16, ease: "power4.in" }, 7.5);
+      AK.words(tl, "#rooms-caption", 8.9, 0.08);
+      // Paylane's investigator tries too
+      tl.fromTo("#rooms-inv-p", { x: 0, rotation: 0 }, { x: -60, duration: 0.4, ease: "power2.in" }, 10.9);
+      tl.to("#rooms-inv-p", { x: 70, rotation: 28, duration: 0.45, ease: "back.out(2)" }, 11.3);
+      tl.to("#rooms-inv-p", { x: 0, rotation: 0, duration: 0.5, ease: "power2.inOut" }, 11.85);
+      tl.fromTo("#rooms-403", { scale: 1 }, { scale: 1.08, duration: 0.08, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, 11.3);
+      // zoom through KudiMart's door into its war room
+      tl.to("#rooms-zoom", { scale: 9, transformOrigin: "784px 509px", duration: 0.6, ease: "power3.in" }, 13.55);
+      window.__timelines["rooms"] = tl;
+    })();
+  </script>
+</template>
