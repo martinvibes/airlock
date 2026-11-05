@@ -31,14 +31,16 @@ Timeline, Nov 3 2026, UTC. Neither change is wrong alone:
 
 - 09:12 KudiMart deploys verifier v2.14.0 to a 10% canary (`pod-canary-1`). v2.14.0 reads only `X-Sig-Primary`. v2.13.2 (still on the other pods) accepts either signature header.
 - 09:40 Paylane rotates its signing secret correctly with a 72h overlap. `X-Sig-Primary` uses the new secret; `X-Sig-Secondary` keeps the old one.
-- Result: the canary holds the old secret and reads only the header signed with the new one, so every webhook routed to it gets a 401. Paylane gives up after 3 tries (retries route to the same pod). 37 customers are stuck.
+- Result: the canary holds the old secret and reads only the header signed with the new one, so every webhook routed to it gets a 401. Paylane gives up after 3 tries (retries route to the same pod): 42 payments.
+- KudiMart's verifier rejects before parsing the body (good practice), so its 401 lines carry no payment reference. Its support team has already credited 5 of the 42 by hand after customer complaints.
+- So neither side alone knows the truth. Paylane's log says 42; replaying all 42 would duplicate 5. KudiMart sees 97 pending and can't tell 37 paid from 60 abandoned. Only the private match gives 37.
 - Fix: KudiMart ships v2.14.1, accepting either header. Paylane replays the 37 webhooks, and a re-run of the match shows 0 stuck.
 
 Synthetic data, seeded and deterministic:
 
 - `provider/payments.csv`: 480 successful payments 08:00–14:00 (reference, amount_kobo, status, customer_phone, card_last4, paid_at, webhook_status).
 - `provider/webhook_attempts.log`, `provider/changes.log`, `provider/signing.json`.
-- `merchant/orders.csv`: the same 480 (443 credited, 37 pending) plus 60 abandoned unpaid pending orders, so "pending" alone can't identify who was debited.
+- `merchant/orders.csv`: the same 480 (443 credited, 5 of them by support, and 37 pending) plus 60 abandoned unpaid pending orders, so "pending" alone can't identify who was debited.
 - `merchant/app.log` (with pod names), `merchant/deploys.log`, `merchant/verifier.json`.
 - A local merchant webhook HTTP server that verifies real HMAC-SHA256 signatures and credits orders. Replay really fails with 401 before the fix and really succeeds after it.
 

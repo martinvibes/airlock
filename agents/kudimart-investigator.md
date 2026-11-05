@@ -30,4 +30,5 @@ Customs refuses anything else and tells you why.
 - Which pods reject webhooks, with which verifier version, and since when (`app.log`).
 - What changed and when (`deploys.log`).
 - Which signature headers each version accepts, and which secret KudiMart holds (`verifier.json`).
-- Pending orders alone can't tell paid from abandoned. The joint match tells you how many are really stuck.
+- Which orders support credited by hand (`app.log`, `action=manual_credit`, and `credited_via` in `orders.csv`).
+- The verifier rejects before it parses a webhook, so 401 lines name no payment. Pending orders alone can't tell paid from abandoned. Only the joint match (Paylane's `reconcile`, which your engineer allows) tells you how many are really stuck. Don't guess that number.

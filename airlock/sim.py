@@ -10,8 +10,16 @@ Story (Nov 3 2026, UTC). Neither change is wrong on its own:
   is signed with the new secret, X-Sig-Secondary with the old one.
 - KudiMart still holds only the old secret. Webhooks are routed to pods by a
   hash of the payment reference, so a payment routed to the canary after
-  09:40 gets a 401 on every retry. Paylane gives up after 3 attempts.
-- 37 customers were debited and their orders are still pending.
+  09:40 gets a 401 on every retry. Paylane gives up after 3 attempts: 42
+  payments.
+- KudiMart's verifier rejects before it parses the body, so its 401 lines
+  carry no reference. It sees 97 pending orders and can't tell the paid ones
+  from the 60 abandoned checkouts.
+- KudiMart support has already credited 5 of the 42 by hand after customers
+  complained. Paylane can't see that: replaying its whole "gave up" list
+  would send 5 webhooks for orders that are already credited.
+- So the truth, 37 debited and still pending, needs both sides' records.
+  That is what the private match computes.
 
 Layout of a data folder:
 
@@ -45,7 +53,9 @@ WINDOW_END = DAY.replace(hour=14)
 CANARY_DEPLOY = DAY.replace(hour=9, minute=12)
 ROTATION = DAY.replace(hour=9, minute=40)
 N_PAYMENTS = 480
-N_STUCK = 37
+N_STUCK = 37          # debited at Paylane, still pending at KudiMart
+N_SUPPORT_CREDITED = 5  # rejected webhooks KudiMart support credited by hand
+N_REJECTED = N_STUCK + N_SUPPORT_CREDITED  # what Paylane's own log shows: 42
 N_ABANDONED = 60
 RETRY_DELAYS = (0, 30, 120)  # seconds after payment, three attempts
 
@@ -88,7 +98,8 @@ def webhook_body(reference: str, amount_kobo: int, paid_at: str) -> bytes:
     ).encode()
 
 
-def is_stuck(reference: str, paid_at: datetime) -> bool:
+def is_rejected(reference: str, paid_at: datetime) -> bool:
+    """Every attempt for this payment gets a 401: canary pod, after the rotation."""
     return paid_at >= ROTATION and route(reference) == CANARY
 
 
@@ -125,9 +136,9 @@ def _payments(seed: int) -> list[Payment]:
 
 
 def find_seed() -> int:
-    """The first seed giving exactly N_STUCK stuck payments. Deterministic."""
+    """The first seed giving exactly N_REJECTED rejected payments. Deterministic."""
     seed = 0
-    while sum(is_stuck(p.reference, p.paid_at) for p in _payments(seed)) != N_STUCK:
+    while sum(is_rejected(p.reference, p.paid_at) for p in _payments(seed)) != N_REJECTED:
         seed += 1
     return seed
 
@@ -143,12 +154,15 @@ def generate(out: Path) -> dict[str, int]:
     attempts: list[tuple[datetime, str]] = []
     app: list[tuple[datetime, str]] = []
     pay_rows, order_rows = [], []
+    rejected = [p for p in payments if is_rejected(p.reference, p.paid_at)]
+    by_support = {p.reference for p in rng.sample(rejected, N_SUPPORT_CREDITED)}
     stuck = 0
     for p in payments:
         pod = route(p.reference)
         version = "v2.14.0" if pod == CANARY and p.paid_at >= CANARY_DEPLOY else "v2.13.2"
-        bad = is_stuck(p.reference, p.paid_at)
-        stuck += bad
+        bad = is_rejected(p.reference, p.paid_at)
+        support = p.reference in by_support
+        stuck += bad and not support
         tries = RETRY_DELAYS if bad else RETRY_DELAYS[:1]
         for n, delay in enumerate(tries, 1):
             at = p.paid_at + timedelta(seconds=delay + rng.randrange(1, 4))
@@ -158,26 +172,35 @@ def generate(out: Path) -> dict[str, int]:
                      f"endpoint=https://api.kudimart.example{ENDPOINT_PATH} status={status} "
                      f"latency_ms={rng.randrange(18, 90)} key_primary={NEW_KEY_ID if p.paid_at >= ROTATION else OLD_KEY_ID}")
             )
-            if bad:
-                app.append((at, f"{ts(at)} level=warn pod={pod} verifier={version} webhook ref={p.reference} "
-                                f"header=X-Sig-Primary result=signature_mismatch status=401"))
+            if bad:  # rejected before the body is parsed: no reference in the log
+                app.append((at, f"{ts(at)} level=warn pod={pod} verifier={version} webhook "
+                                f"header=X-Sig-Primary result=signature_mismatch status=401 body=unparsed"))
             else:
                 app.append((at, f"{ts(at)} level=info pod={pod} verifier={version} webhook ref={p.reference} "
                                 f"result=ok order={p.order_id} status=200 credited"))
         if bad:
             at = p.paid_at + timedelta(seconds=RETRY_DELAYS[-1] + 5)
             attempts.append((at, f"{ts(at)} gave_up ref={p.reference} merchant=kudimart attempts=3 last_status=401"))
+        if support:
+            at = p.paid_at + timedelta(minutes=rng.randrange(25, 70))
+            app.append((at, f"{ts(at)} level=info source=support-console action=manual_credit "
+                            f"order={p.order_id} reason=customer_reports_debit"))
+            status, credited_at, via = "credited", ts(at), "support"
+        elif bad:
+            status, credited_at, via = "pending", "", ""
+        else:
+            status, credited_at, via = "credited", ts(p.paid_at + timedelta(seconds=3)), "webhook"
         pay_rows.append([p.reference, p.amount_kobo, "success", p.phone, p.card_last4, ts(p.paid_at),
                          "gave_up" if bad else "delivered"])
         order_rows.append([p.order_id, p.reference, p.amount_kobo, p.phone, ts(p.paid_at - timedelta(seconds=40)),
-                           "pending" if bad else "credited", "" if bad else ts(p.paid_at + timedelta(seconds=3))])
+                           status, credited_at, via])
 
     span = int((WINDOW_END - WINDOW_START).total_seconds())
     for n in range(1, N_ABANDONED + 1):
         created = WINDOW_START + timedelta(seconds=rng.randrange(span))
         order_rows.append([f"KM-{200000 + n}", f"KDM-{rng.randrange(16**6):06X}-A{n:03d}",
                            rng.randrange(150_000, 2_500_000, 50), "+234800" + f"{rng.randrange(10**7):07d}",
-                           ts(created), "pending", ""])
+                           ts(created), "pending", "", ""])
     order_rows.sort(key=lambda r: r[4])
 
     with open(prov / "payments.csv", "w", newline="") as f:
@@ -186,7 +209,8 @@ def generate(out: Path) -> dict[str, int]:
         w.writerows(pay_rows)
     with open(merch / "orders.csv", "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["order_id", "reference", "amount_kobo", "customer_phone", "created_at", "status", "credited_at"])
+        w.writerow(["order_id", "reference", "amount_kobo", "customer_phone", "created_at", "status",
+                    "credited_at", "credited_via"])
         w.writerows(order_rows)
     (prov / "webhook_attempts.log").write_text("\n".join(line for _, line in sorted(attempts)) + "\n")
     (merch / "app.log").write_text("\n".join(line for _, line in sorted(app)) + "\n")
@@ -220,7 +244,8 @@ def generate(out: Path) -> dict[str, int]:
         "routing": "sha256(reference) mod 10 picks the pod; retries go to the same pod",
         "note": "synthetic secret for a fictional demo",
     }, indent=2) + "\n")
-    return {"payments": len(pay_rows), "orders": len(order_rows), "stuck": stuck, "seed": seed}
+    return {"payments": len(pay_rows), "orders": len(order_rows), "rejected": len(rejected),
+            "support_credited": len(by_support), "stuck": stuck, "seed": seed}
 
 
 def reset(src: Path, dst: Path) -> None:
@@ -285,9 +310,9 @@ class Merchant:
             hmac.compare_digest(headers.get(h.lower(), ""), sign(body, secret)) for h in accepted
         )
         now = ts(datetime.now(UTC))
-        if not ok:
-            self._log(f"{now} level=warn pod={pod} verifier={version} webhook ref={reference} "
-                      f"header={'+'.join(accepted)} result=signature_mismatch status=401")
+        if not ok:  # nothing from an unverified body goes in the log
+            self._log(f"{now} level=warn pod={pod} verifier={version} webhook "
+                      f"header={'+'.join(accepted)} result=signature_mismatch status=401 body=unparsed")
             return 401, "signature mismatch"
         with self.lock:
             rows = read_csv(self.dir / "orders.csv")
@@ -295,9 +320,12 @@ class Merchant:
                 if r["reference"] == reference:
                     if int(r["amount_kobo"]) != amount:
                         return 409, "amount mismatch"
-                    if r["status"] != "credited":
-                        r["status"], r["credited_at"] = "credited", now
-                        self._write_orders(rows)
+                    if r["status"] == "credited":
+                        self._log(f"{now} level=warn pod={pod} verifier={version} webhook ref={reference} "
+                                  f"result=duplicate order={r['order_id']} status=200 already_credited")
+                        return 200, "already credited"
+                    r["status"], r["credited_at"], r["credited_via"] = "credited", now, "webhook"
+                    self._write_orders(rows)
                     self._log(f"{now} level=info pod={pod} verifier={version} webhook ref={reference} "
                               f"result=ok order={r['order_id']} status=200 credited")
                     return 200, "credited"

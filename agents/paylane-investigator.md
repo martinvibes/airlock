@@ -29,3 +29,4 @@ Customs refuses anything else and tells you why.
 - How many webhook attempts were delivered, rejected with 401, and given up on, and when the 401s started (`webhook_attempts.log`).
 - What Paylane changed and when (`changes.log`).
 - Which secret signs each header (`signing.json`; key ids only, never the secret values).
+- Your "gave up" list is what Paylane failed to deliver, not what KudiMart is missing: KudiMart may have credited some orders another way. Only the joint match (`reconcile` by your engineer) shows how many are really stuck, and only those get replayed.

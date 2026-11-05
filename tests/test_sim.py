@@ -32,6 +32,7 @@ def free_port():
 def test_generation_matches_the_story(pristine):
     out, summary = pristine
     assert summary["payments"] == 480 and summary["stuck"] == 37
+    assert summary["rejected"] == 42 and summary["support_credited"] == 5
     orders = sim.read_csv(out / "merchant" / "orders.csv")
     assert len(orders) == 540
     assert sum(o["status"] == "pending" for o in orders) == 97  # 37 paid + 60 abandoned
@@ -56,8 +57,21 @@ def test_all_401s_come_from_the_canary(pristine):
     out, _ = pristine
     lines = (out / "merchant" / "app.log").read_text().splitlines()
     rejected = [line for line in lines if "status=401" in line]
-    assert len(rejected) == 111
+    assert len(rejected) == 126  # 42 payments x 3 attempts
     assert all("pod=pod-canary-1" in line and "verifier=v2.14.0" in line for line in rejected)
+
+
+def test_neither_side_alone_knows_the_37(pristine):
+    out, _ = pristine
+    # KudiMart's verifier rejects before parsing: its 401 lines name no payment.
+    app = (out / "merchant" / "app.log").read_text().splitlines()
+    assert not any("ref=" in line or "order=" in line for line in app if "status=401" in line)
+    # Paylane's own log says 42 gave up, but support already credited 5 by hand.
+    gave_up = [r for r in sim.read_csv(out / "provider" / "payments.csv") if r["webhook_status"] == "gave_up"]
+    assert len(gave_up) == 42
+    orders = {o["reference"]: o for o in sim.read_csv(out / "merchant" / "orders.csv")}
+    assert sum(orders[r["reference"]]["credited_via"] == "support" for r in gave_up) == 5
+    assert sum("action=manual_credit" in line for line in app) == 5
 
 
 def test_pending_alone_cannot_identify_the_paid(pristine):
@@ -90,6 +104,15 @@ def test_full_incident_replay_fails_before_fix_then_closes(live):
         assert after == {"attempted": 37, "delivered": 37, "rejected": 0}
 
         assert run_psi(live / "provider", live / "merchant") == []
+
+        # Had Paylane replayed its whole gave-up list, 5 would have been duplicates.
+        provider = sim.read_csv(live / "provider" / "payments.csv")
+        everything = [psi.item(r["reference"], int(r["amount_kobo"])) for r in provider
+                      if r["webhook_status"] == "gave_up"]
+        again = sim.replay(live / "provider", everything, url)
+        assert again["attempted"] == 42
+        log = (live / "merchant" / "app.log").read_text()
+        assert log.count("result=duplicate") == 42  # the 37 just replayed, plus 5 credited by support
     finally:
         server.shutdown()
 
