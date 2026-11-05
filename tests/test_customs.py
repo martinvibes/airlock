@@ -189,6 +189,17 @@ def test_bad_proposals_are_refused_with_a_reason(world, bad, reason):
     assert net.texts(AIR) == []
 
 
+def test_release_several_is_all_or_nothing(world):
+    net, _, _ = world
+    for code in ("merchant_verifier_reads_primary_header_only", "merchant_holds_old_secret_only"):
+        say(net, K_ROOM, K_INV, f'@kudimart-customs propose {{"kind":"finding","code":"{code}"}}')
+    say(net, K_ROOM, K_ENG, "release 1 9")
+    assert "no queued claim 9" in last(net, K_ROOM) and net.texts(AIR) == []
+    say(net, K_ROOM, K_ENG, "release 1 2")
+    assert last(net, K_ROOM) == "Claims 1, 2 released to airlock."
+    assert len(airlock_claims(net)) == 2
+
+
 def test_reject(world):
     net, _, _ = world
     say(net, K_ROOM, K_INV, "propose " + FINDING)

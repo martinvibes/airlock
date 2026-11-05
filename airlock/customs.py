@@ -30,7 +30,7 @@ log = logging.getLogger("airlock.customs")
 
 COMMANDS = ("propose", "release", "reject", "status", "reconcile", "allow", "sign", "help")
 HELP = (
-    "Commands: `propose {claim json}` · `release N` · `reject N` · `status` · "
+    "Commands: `propose {claim json}` · `release N [N…]` · `reject N [N…]` · `status` · "
     "`sign <proposal_id>` · provider: `reconcile <start> <end>` · merchant: `allow <run_id>`"
 )
 
@@ -187,30 +187,39 @@ class Customs:
             f"Only {self.cfg.engineer_name} can send it: `release {n}` or `reject {n}`."
         )
 
-    def _queued(self, rest: str) -> Queued:
+    def _queued(self, rest: str) -> list[Queued]:
+        """`release 3` or `release 3 5 7`: every number must be a queued claim,
+        or nothing happens."""
         try:
-            n = int(rest)
+            numbers = [int(t) for t in rest.replace(",", " ").split()]
         except ValueError:
-            raise ClaimError("give a claim number, like `release 3`") from None
-        q = self.queue.get(n)
-        if q is None or q.status != "queued":
-            raise ClaimError(f"there is no queued claim {n}")
-        return q
+            raise ClaimError("give claim numbers, like `release 3` or `release 3 5`") from None
+        if not numbers:
+            raise ClaimError("give claim numbers, like `release 3` or `release 3 5`")
+        out = []
+        for n in dict.fromkeys(numbers):
+            q = self.queue.get(n)
+            if q is None or q.status != "queued":
+                raise ClaimError(f"there is no queued claim {n}")
+            out.append(q)
+        return out
 
     def _cmd_release(self, msg: Message, rest: str) -> None:
         if not self._require_engineer(msg, "release claims"):
             return
-        q = self._queued(rest)
-        self._send(q.claim)
-        q.status = "released"
-        self._say(f"Claim {q.n} released to airlock.")
+        qs = self._queued(rest)
+        for q in qs:
+            self._send(q.claim)
+            q.status = "released"
+        self._say(f"Claim{'s' if len(qs) > 1 else ''} {', '.join(str(q.n) for q in qs)} released to airlock.")
 
     def _cmd_reject(self, msg: Message, rest: str) -> None:
         if not self._require_engineer(msg, "reject claims"):
             return
-        q = self._queued(rest)
-        q.status = "rejected"
-        self._say(f"Claim {q.n} rejected. Nothing was sent.")
+        qs = self._queued(rest)
+        for q in qs:
+            q.status = "rejected"
+        self._say(f"Claim{'s' if len(qs) > 1 else ''} {', '.join(str(q.n) for q in qs)} rejected. Nothing was sent.")
 
     def _cmd_status(self, msg: Message, rest: str) -> None:
         lines = [f"{self.cfg.company}-customs status"]
