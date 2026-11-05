@@ -1,0 +1,9 @@
+# Airlock override for Switch's deploy/local/docker-compose.yml.
+# Publishes Switch's Postgres on 5433 so it doesn't collide with a Postgres
+# already running on the host's 5432. Use with:
+#   docker compose -f <switch>/deploy/local/docker-compose.yml \
+#     -f deploy/switch-compose.override.yml --project-directory <switch> up -d
+services:
+  postgres:
+    ports: !override
+      - "127.0.0.1:${AIRLOCK_PG_PORT:-5433}:5432"
