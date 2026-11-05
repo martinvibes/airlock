@@ -222,6 +222,9 @@ def test_only_the_provider_engineer_starts_and_only_merchant_engineer_allows(wor
     say(net, P_ROOM, P_INV, f"reconcile {START} {END}")
     assert last(net, P_ROOM).startswith("REFUSED")
     say(net, P_ROOM, P_ENG, f"reconcile {START} {END}")
+    asked = last(net, K_ROOM)
+    assert asked.startswith("From paylane, validated by Customs.") and "allow run-1" in asked
+    assert "@kudimart-investigator" not in asked  # match steps are for the engineer only
     say(net, K_ROOM, K_INV, "allow run-1")
     assert last(net, K_ROOM).startswith("REFUSED")
     assert results(net, "psi_round1") == []
