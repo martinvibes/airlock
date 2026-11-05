@@ -4,6 +4,8 @@
     uv run python scripts/ask.py kudimart "release 1"
     uv run python scripts/ask.py paylane --room airlock "hello"
     uv run python scripts/ask.py kudimart --watch 120        # just print the room
+    uv run python scripts/ask.py kudimart --as-investigator "release 1"     # refused by Customs
+    uv run python scripts/ask.py kudimart --as-investigator --room airlock "hi"  # refused by Switch (403)
 
 `@investigator` and `@customs` are expanded to the company's real agent names.
 """
@@ -21,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from airlock.mattermost import Mattermost  # noqa: E402
-from airlock.switch_client import AgentClient, Gateway  # noqa: E402
+from airlock.switch_client import AgentClient, Gateway, SwitchError  # noqa: E402
 
 
 def main() -> None:
@@ -32,6 +34,7 @@ def main() -> None:
     ap.add_argument("--watch", type=float, default=90, help="seconds to keep printing replies")
     ap.add_argument("--until", help="stop once a message contains this text")
     ap.add_argument("--mm", action="store_true", help="post from the engineer's Mattermost account")
+    ap.add_argument("--as-investigator", action="store_true", help="post with the investigator's own agent key")
     args = ap.parse_args()
 
     state = json.loads((ROOT / "state" / "airlock.json").read_text())
@@ -47,7 +50,14 @@ def main() -> None:
             if f"@{short}" in text:
                 text = text.replace(f"@{short}", f"@{a['name']}")
                 mention.append(a["id"])
-        if args.mm:
+        if args.as_investigator:
+            inv = c["agents"]["investigator"]
+            try:
+                AgentClient(state["switch_url"], inv["id"], inv["api_key"]).post(room, text)
+            except SwitchError as e:
+                print(f"Switch refused {inv['name']}: {e.status} {e.detail}")
+                return
+        elif args.mm:
             mm = Mattermost(state["mattermost"]["url"])
             mm.login(c["mattermost"]["username"], c["mattermost"]["password"])
             key = args.company if args.room == "private" else "airlock"

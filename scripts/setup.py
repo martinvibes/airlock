@@ -288,6 +288,11 @@ def main() -> None:
     STATE_FILE.write_text(json.dumps(state, indent=2))
     print(f"rooms: kudimart-war-room{sfx}, paylane-war-room{sfx}, airlock{sfx}")
     print(f"wrote {STATE_FILE.relative_to(ROOT)}")
+    if mm_admin is not None:
+        print(f"\nMattermost ({state['mattermost']['url']}), synthetic accounts for this demo:")
+        for co in COMPANIES:
+            m = state["companies"][co]["mattermost"]
+            print(f"  {m['username']:<20} {m['password']}")
 
 
 if __name__ == "__main__":
