@@ -76,6 +76,10 @@ class Gateway:
     def agents(self) -> list[dict[str, Any]]:
         return _check(self.http.get("/agents"))
 
+    def set_agent_icon(self, agent_id: str, icon_url: str | None) -> dict[str, Any]:
+        """Switch stores a public https link, never the image itself."""
+        return _check(self.http.put(f"/agents/{agent_id}/icon", json={"icon_url": icon_url}))
+
     def delete_agent(self, agent_id: str) -> None:
         _check(self.http.delete(f"/agents/{agent_id}"))
 

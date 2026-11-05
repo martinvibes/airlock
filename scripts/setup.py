@@ -54,6 +54,10 @@ COMPANIES = {
     "paylane": {"title": "Paylane", "party": "provider", "data": "provider", "peer": "kudimart"},
 }
 
+# The Airlock door, on Customs (the gatekeepers). Switch only takes public https
+# links, so this shows once the repo is public; until then Switch draws its own.
+CUSTOMS_ICON = "https://raw.githubusercontent.com/martinvibes/airlock/main/assets/logo/airlock-avatar.png"
+
 AIRLOCK_INSTRUCTIONS = (
     "Shared room between KudiMart and Paylane. Only the two Customs agents carry information "
     "across, as typed AIRLOCK/1 claims released by an engineer. Customs refuses free text. "
@@ -63,6 +67,18 @@ AIRLOCK_INSTRUCTIONS = (
 
 def private_instructions(company: str) -> str:
     return (ROOT / "agents" / f"{company}-investigator.md").read_text()
+
+
+def set_icons(state: dict) -> None:
+    for co, c in state["companies"].items():
+        gw = c.get("_gw")
+        if gw is None:
+            gw = Gateway(state["switch_url"])
+            gw.login(c["user"]["email"], c["user"]["password"])
+        try:
+            gw.set_agent_icon(c["agents"]["customs"]["id"], CUSTOMS_ICON)
+        except SwitchError as e:
+            print(f"warning: could not set {c['agents']['customs']['name']}'s icon: {e}")
 
 
 def mm_password() -> str:
@@ -103,7 +119,13 @@ def main() -> None:
     ap.add_argument("--mattermost", action="store_true", help="mirror the rooms into Mattermost")
     ap.add_argument("--mattermost-bridge", help="bridge id (default: Switch's default Mattermost bridge)")
     ap.add_argument("--suffix", default="", help="append to every name (for repeated runs on one server)")
+    ap.add_argument("--icons-only", action="store_true",
+                    help="only (re)set the Customs icons for the agents in state/airlock.json")
     args = ap.parse_args()
+    if args.icons_only:
+        set_icons(json.loads(STATE_FILE.read_text()))
+        print("icons set")
+        return
 
     base = os.environ.get("SWITCH_URL", "http://localhost:8000")
     sfx = args.suffix
@@ -216,6 +238,8 @@ def main() -> None:
         state["mattermost"]["channels"] = {k: {"id": v["id"], "name": v["name"]} for k, v in chans.items()}
         for k, v in chans.items():
             print(f"Mattermost channel {v['name']}: {len(mm_admin.members(v['id']))} members")
+
+    set_icons(state)
 
     # 5. Addressing policies, set by each owner. Customs answers its own people in
     # its room, anyone in airlock (so it can refuse visibly), and the peer Customs.

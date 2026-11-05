@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Airlock">
+  <title>Airlock</title>
+  <path d="M30 112 V58 A34 34 0 0 1 98 58 V112 Z" fill="#5C3A21"/>
+  <rect x="62" y="26" width="4" height="86" fill="#F4ECE1"/>
+  <circle cx="55" cy="76" r="4" fill="#C08A4A"/>
+  <circle cx="73" cy="76" r="4" fill="#C08A4A"/>
+  <rect x="22" y="110" width="84" height="6" rx="3" fill="#3E2415"/>
+</svg>

@@ -16,6 +16,10 @@ setup *ARGS:
     SWITCH_ADMIN_EMAIL="$GATEWAY_ADMIN_EMAIL" SWITCH_ADMIN_PASSWORD="$GATEWAY_ADMIN_PASSWORD" \
     uv run python scripts/setup.py --mattermost {{ARGS}}
 
+# Re-apply the Customs icons (after the repo goes public, so Switch can fetch them).
+icons:
+    uv run python scripts/setup.py --icons-only
+
 # The whole incident, scripted, on the live server. No model.
 e2e:
     uv run python scripts/e2e_live.py
