@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Airlock logo options</title>
+<style>
+  :root { --bg:#EFE6DA; --card:#FBF7F1; --ink:#3E2415; --muted:#7A5A43; --line:#E3D6C5; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 Georgia, "Times New Roman", serif; padding:32px 16px; }
+  h1 { margin:0 auto 4px; max-width:1100px; font-size:26px; font-weight:normal; }
+  p.lead { margin:0 auto 24px; max-width:1100px; color:var(--muted); }
+  .grid { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; }
+  .card h2 { margin:0 0 14px; font-size:18px; font-weight:normal; }
+  .tiles { display:flex; gap:10px; margin-bottom:14px; }
+  .tile { flex:1; border-radius:10px; display:grid; place-items:center; padding:16px 0; }
+  .tile.cream { background:#F4ECE1; } .tile.white { background:#FFFFFF; border:1px solid var(--line); }
+  .tile img { width:92px; height:92px; }
+  .small { display:flex; align-items:center; gap:12px; margin-bottom:14px; color:var(--muted); font-size:13px; }
+  .small img.s32 { width:32px; } .small img.s20 { width:20px; }
+  .lockup { display:flex; align-items:center; gap:10px; border-top:1px solid var(--line); padding-top:14px; }
+  .lockup img { width:44px; } .lockup span { font-size:30px; letter-spacing:0.01em; color:#3E2415; }
+  .pick { font-size:12px; font-family:-apple-system, sans-serif; background:#5C3A21; color:#F4ECE1; border-radius:999px; padding:2px 10px; margin-left:6px; vertical-align:middle; }
+  .swatches { max-width:1100px; margin:20px auto 0; display:flex; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:13px; }
+  .sw { display:flex; align-items:center; gap:6px; } .sw i { width:18px; height:18px; border-radius:4px; display:inline-block; border:1px solid var(--line); }
+</style></head><body>
+<h1>Airlock: logo options</h1>
+<p class="lead">Flat, one wood colour, nothing fancy.</p>
+<div class="grid">
+  <div class="card"><h2>1 · Door <span class="pick">my pick</span></h2>
+    <div class="tiles"><div class="tile cream"><img src="1-door.svg" alt=""></div><div class="tile white"><img src="1-door.svg" alt=""></div></div>
+    <div class="small"><img class="s32" src="1-door.svg" alt=""><img class="s20" src="1-door.svg" alt="">small sizes</div>
+    <div class="lockup"><img src="1-door.svg" alt=""><span>Airlock</span></div></div>
+  <div class="card"><h2>2 · Door, with grain</h2>
+    <div class="tiles"><div class="tile cream"><img src="2-door-grain.svg" alt=""></div><div class="tile white"><img src="2-door-grain.svg" alt=""></div></div>
+    <div class="small"><img class="s32" src="2-door-grain.svg" alt=""><img class="s20" src="2-door-grain.svg" alt="">small sizes</div>
+    <div class="lockup"><img src="2-door-grain.svg" alt=""><span>Airlock</span></div></div>
+  <div class="card"><h2>3 · Seal</h2>
+    <div class="tiles"><div class="tile cream"><img src="3-seal.svg" alt=""></div><div class="tile white"><img src="3-seal.svg" alt=""></div></div>
+    <div class="small"><img class="s32" src="3-seal.svg" alt=""><img class="s20" src="3-seal.svg" alt="">small sizes</div>
+    <div class="lockup"><img src="3-seal.svg" alt=""><span>Airlock</span></div></div>
+  <div class="card"><h2>4 · Two doors, one pass</h2>
+    <div class="tiles"><div class="tile cream"><img src="4-two-doors.svg" alt=""></div><div class="tile white"><img src="4-two-doors.svg" alt=""></div></div>
+    <div class="small"><img class="s32" src="4-two-doors.svg" alt=""><img class="s20" src="4-two-doors.svg" alt="">small sizes</div>
+    <div class="lockup"><img src="4-two-doors.svg" alt=""><span>Airlock</span></div></div>
+</div>
+<div class="swatches">
+  <span class="sw"><i style="background:#3E2415"></i>deep oud #3E2415</span>
+  <span class="sw"><i style="background:#5C3A21"></i>oud #5C3A21</span>
+  <span class="sw"><i style="background:#C08A4A"></i>resin #C08A4A</span>
+  <span class="sw"><i style="background:#F4ECE1"></i>cream #F4ECE1</span>
+</div>
+</body></html>
