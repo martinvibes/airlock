@@ -144,6 +144,10 @@ def main() -> None:
     check("match finds 37 stuck among 480", res["stuck_count"] == 37, f"merchant sent {r2['count']} blinded credited orders")
     stuck_file = Path(state["companies"]["paylane"]["workspace"]) / f"stuck-{run1}.txt"
     check("Paylane keeps the stuck list on its side", stuck_file.exists() and len(stuck_file.read_text().split()) == 37)
+    gave_up = [r for r in sim.read_csv(Path(state["companies"]["paylane"]["workspace"]) / "payments.csv")
+               if r["webhook_status"] == "gave_up"]
+    check("Paylane's own log says 42 gave up; the match narrows it to 37", len(gave_up) == 42,
+          "5 were credited by KudiMart support; replaying them would duplicate")
 
     print("\n3. Evidence, released by engineers only")
     finding = '{"kind":"finding","code":"merchant_verifier_reads_primary_header_only"}'
