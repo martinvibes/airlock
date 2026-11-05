@@ -217,7 +217,13 @@ def main() -> None:
             username, mpw = f"{co}-eng{sfx}", mm_password()
             mu = mm_admin.create_user(username, f"{co}-eng{sfx}@airlock.example.com", mpw,
                                       meta["title"], "Engineer")
-            mm_admin.add_to_team(team["id"], mu["id"])
+            try:
+                mm_admin.add_to_team(team["id"], mu["id"])
+            except RuntimeError as e:
+                if "max_accounts" not in str(e):
+                    raise
+                sys.exit("Mattermost's team is full. Raise System Console > Site Configuration > Users and Teams > "
+                         "Max Users Per Team, then rerun with a new --suffix.")
             link_mattermost(gw, state["mattermost"]["url"], bridge, username, mpw, mu["id"])
             state["companies"][co]["mattermost"] = {"username": username, "password": mpw, "user_id": mu["id"]}
             print(f"{meta['title']}: Mattermost account {username}, linked to {email}")
