@@ -14,7 +14,7 @@
   <a href="#why-switch-is-central">Why Switch</a> ·
   <a href="#run-it">Run it</a> ·
   <a href="#security-model-and-honest-limits">Limits</a> ·
-  <a href="docs/BLOG.md">Blog</a>
+  <a href="https://dev.to/martinez21/two-companies-one-outage-zero-shared-logs-building-airlock-on-switch-1e5h">Blog</a>
 </p>
 
 Each company investigates a shared production failure in its own private [Switch](https://github.com/sandbox-quantum/switch) room, with its own Claude Code investigator that can read only that company's files. Between the two companies, the only things that cross are typed claims a human released and blinded data for a private match, all through one shared room, `airlock`. Nobody shows the other side their logs, and the incident still gets closed.
