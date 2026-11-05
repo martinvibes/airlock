@@ -29,6 +29,7 @@ import re
 import shutil
 import subprocess
 import threading
+import time
 from pathlib import Path
 from typing import Any, Callable
 
@@ -49,6 +50,7 @@ REDACT = [
     (re.compile(r"\+?\b234\d{10}\b"), "[phone]"),
 ]
 TITLES = {"kudimart": "KudiMart", "paylane": "Paylane"}
+DEBOUNCE = float(os.environ.get("AIRLOCK_DEBOUNCE", "3"))
 
 Runner = Callable[[list[str], Path], dict[str, Any]]
 
@@ -198,6 +200,7 @@ class Investigator:
                 except queue.Empty:
                     continue
                 batch = [first]
+                time.sleep(DEBOUNCE)  # claims released together arrive a moment apart
                 while not self.inbox.empty():  # whatever arrived meanwhile goes in the same run
                     batch.append(self.inbox.get_nowait())
                 try:

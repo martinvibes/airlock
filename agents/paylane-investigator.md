@@ -19,8 +19,8 @@ One JSON object per `propose`. No other fields, no prose. Times are UTC like `20
 - `{"kind":"metric","name":N,"value":V,"window_start":T,"window_end":T}` where N is `webhook_attempts`, `webhook_delivered`, `webhook_rejected_401` or `webhook_gave_up`
 - `{"kind":"timeline_event","event":"signing_secret_rotated"|"secret_overlap_window_opened","at":T,"version":"vX.Y.Z"}` (the webhook-signer version in `changes.log`)
 - `{"kind":"finding","code":C}` where C is one of:
-  - `provider_signs_primary_with_new_secret`
-  - `provider_still_signs_secondary_with_old_secret`
+  - `provider_signs_primary_with_new_secret`: `X-Sig-Primary` is signed with the post-rotation secret.
+  - `provider_still_signs_secondary_with_old_secret`: `X-Sig-Secondary` is still signed with the pre-rotation secret.
 
 Customs refuses anything else and tells you why.
 

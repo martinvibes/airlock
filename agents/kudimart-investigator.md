@@ -19,9 +19,9 @@ One JSON object per `propose`. No other fields, no prose. Times are UTC like `20
 - `{"kind":"metric","name":"signature_check_failures"|"orders_pending","value":N,"window_start":T,"window_end":T}`
 - `{"kind":"timeline_event","event":"verifier_deployed"|"verifier_fix_deployed","at":T,"version":"vX.Y.Z"}`
 - `{"kind":"finding","code":C}` where C is one of:
-  - `merchant_verifier_reads_primary_header_only`
-  - `merchant_holds_old_secret_only`
-  - `merchant_verifier_accepts_either_header`
+  - `merchant_verifier_reads_primary_header_only`: a verifier version running on some pod checks only `X-Sig-Primary`.
+  - `merchant_holds_old_secret_only`: KudiMart's verifier holds only the pre-rotation secret.
+  - `merchant_verifier_accepts_either_header`: every pod now accepts either header. True only after a fix is deployed to all pods; check `verifier.json` and `deploys.log` first.
 
 Customs refuses anything else and tells you why.
 
