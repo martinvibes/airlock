@@ -4,8 +4,8 @@ Goal: a judge who has never heard of Airlock should see three things in under th
 
 ## Before recording
 
-1. Fresh run: `just setup --suffix=-demo` (fresh names, so channels are clean), then `just up`.
-   - The names then carry the suffix: `kudimart-investigator-demo` and so on. Use `--suffix=` with a short word, or reset Switch's database for unsuffixed names.
+1. Fresh run: `just setup --suffix=-live` (fresh names, so channels are clean), then `just up`.
+   - The names then carry the suffix: `kudimart-investigator-live` and so on. `-demo` is taken by the README screenshots run, so pick another short word, or reset Switch's database for unsuffixed names.
 2. Three windows:
    - **Left:** browser logged in to Mattermost as `kudimart-eng`, on `kudimart-war-room`.
    - **Right:** a private window logged in as `paylane-eng`, on `paylane-war-room`.
