@@ -16,9 +16,9 @@ setup *ARGS:
     SWITCH_ADMIN_EMAIL="$GATEWAY_ADMIN_EMAIL" SWITCH_ADMIN_PASSWORD="$GATEWAY_ADMIN_PASSWORD" \
     uv run python scripts/setup.py --mattermost {{ARGS}}
 
-# Re-apply the Customs icons (after the repo goes public, so Switch can fetch them).
+# Re-apply the Customs icons: through Switch (needs the repo public) and straight to Mattermost.
 icons:
-    uv run python scripts/setup.py --icons-only
+    set -a && . {{switch_env}} && set +a && uv run python scripts/setup.py --icons-only
 
 # The whole incident, scripted, on the live server. No model.
 e2e:

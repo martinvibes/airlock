@@ -56,5 +56,8 @@ class Mattermost:
     def remove_from_channel(self, channel_id: str, user_id: str) -> None:
         self._ok(self.http.delete(f"/channels/{channel_id}/members/{user_id}"))
 
+    def set_avatar(self, user_id: str, png: bytes) -> None:
+        self._ok(self.http.post(f"/users/{user_id}/image", files={"image": ("avatar.png", png, "image/png")}))
+
     def post(self, channel_id: str, message: str) -> dict[str, Any]:
         return self._ok(self.http.post("/posts", json={"channel_id": channel_id, "message": message}))

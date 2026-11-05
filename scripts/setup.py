@@ -81,6 +81,26 @@ def set_icons(state: dict) -> None:
             print(f"warning: could not set {c['agents']['customs']['name']}'s icon: {e}")
 
 
+def mm_avatars(state: dict, mm_admin: Mattermost) -> None:
+    """Give the Customs bots the logo in Mattermost directly. Switch does the same
+    from CUSTOMS_ICON once that URL is public; this covers a private checkout."""
+    png = (ROOT / "assets" / "logo" / "airlock-avatar.png").read_bytes()
+    for c in state["companies"].values():
+        name = c["agents"]["customs"]["name"]
+        try:
+            mm_admin.set_avatar(mm_admin.user_by_username(name)["id"], png)
+        except RuntimeError as e:
+            print(f"warning: could not set {name}'s Mattermost avatar: {e}")
+
+
+def mm_admin_from_env(url: str) -> Mattermost | None:
+    if not os.environ.get("MATTERMOST_ADMIN_USER"):
+        return None
+    mm = Mattermost(url)
+    mm.login(os.environ["MATTERMOST_ADMIN_USER"], os.environ["MATTERMOST_ADMIN_PASSWORD"])
+    return mm
+
+
 def mm_password() -> str:
     return secrets.token_urlsafe(14) + "Aa1!"
 
@@ -123,7 +143,11 @@ def main() -> None:
                     help="only (re)set the Customs icons for the agents in state/airlock.json")
     args = ap.parse_args()
     if args.icons_only:
-        set_icons(json.loads(STATE_FILE.read_text()))
+        state = json.loads(STATE_FILE.read_text())
+        set_icons(state)
+        mm = mm_admin_from_env(state["mattermost"]["url"]) if "mattermost" in state else None
+        if mm is not None:
+            mm_avatars(state, mm)
         print("icons set")
         return
 
@@ -240,6 +264,8 @@ def main() -> None:
             print(f"Mattermost channel {v['name']}: {len(mm_admin.members(v['id']))} members")
 
     set_icons(state)
+    if mm_admin is not None:
+        mm_avatars(state, mm_admin)
 
     # 5. Addressing policies, set by each owner. Customs answers its own people in
     # its room, anyone in airlock (so it can refuse visibly), and the peer Customs.
