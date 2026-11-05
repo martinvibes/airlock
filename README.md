@@ -251,6 +251,6 @@ agents/       investigator rules (become CLAUDE.md in each company's folder)
 data/         synthetic incident: provider/ (Paylane) and merchant/ (KudiMart)
 scripts/      setup, e2e_live, up, ask, spike_isolation
 tests/        offline tests
-docs/         BRIEF.md (design brief), DEMO.md (video script)
+docs/         BRIEF.md (design brief), DEMO.md (video script), BLOG.md (blog draft)
 state/        created at runtime: credentials and each company's live folder (gitignored)
 ```
