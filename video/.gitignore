@@ -1,3 +1,5 @@
 .hyperframes/
 boards/fix*/
 renders/
+.thumbnails/
+.waveform-cache/
