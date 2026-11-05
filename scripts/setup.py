@@ -11,7 +11,14 @@ Writes state/airlock.json (credentials and ids; gitignored) and resets the
 live data folders state/kudimart and state/paylane from data/.
 
     SWITCH_URL=http://localhost:8000 SWITCH_ADMIN_EMAIL=... SWITCH_ADMIN_PASSWORD=... \
-        uv run python scripts/setup.py [--mattermost-bridge <bridge_id>]
+        uv run python scripts/setup.py [--mattermost] [--suffix=-2]
+
+With --mattermost the three rooms are also Mattermost channels, and each
+engineer gets a Mattermost account linked to their Switch user (confirmed
+with that account's own session, as Switch requires). Needs
+MATTERMOST_ADMIN_USER and MATTERMOST_ADMIN_PASSWORD (Switch's .env has them).
+The bundled Mattermost user that Switch adds to every channel it creates is
+taken out of the two private channels.
 """
 
 from __future__ import annotations
@@ -22,12 +29,15 @@ import os
 import secrets
 import shutil
 import sys
+import time
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from airlock import sim  # noqa: E402
+from airlock.mattermost import Mattermost  # noqa: E402
 from airlock.switch_client import (  # noqa: E402
     AgentClient,
     Gateway,
@@ -55,9 +65,43 @@ def private_instructions(company: str) -> str:
     return (ROOT / "agents" / f"{company}-investigator.md").read_text()
 
 
+def mm_password() -> str:
+    return secrets.token_urlsafe(14) + "Aa1!"
+
+
+def link_mattermost(gw: Gateway, mm_url: str, bridge: str, username: str, password: str, ext_id: str) -> None:
+    """Claim the Mattermost account for this Switch user, then confirm the claim
+    with the account's own session. Until confirmed, the link counts for nothing."""
+    for _ in range(60):
+        found = gw.directory(bridge, username).get("users", [])
+        if any(u["external_user_id"] == ext_id for u in found):
+            break
+        time.sleep(1)
+    else:
+        sys.exit(f"Mattermost bridge never listed {username}")
+    ident = gw.claim_identity(bridge, ext_id, username)
+    if ident.get("link_request") is None:
+        return
+    mm = Mattermost(mm_url)
+    mm.login(username, password)
+    try:
+        gw.verify_identity(bridge, ident["id"], mm.token or "")
+    finally:
+        mm.logout()
+
+
+def channel_name(room: dict) -> str:
+    url = room.get("external_channel_url") or ""
+    name = urlparse(url).path.rsplit("/", 1)[-1]
+    if not name:
+        sys.exit(f"room {room.get('name')} has no Mattermost channel")
+    return name
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mattermost-bridge", help="bridge id to mirror rooms into Mattermost")
+    ap.add_argument("--mattermost", action="store_true", help="mirror the rooms into Mattermost")
+    ap.add_argument("--mattermost-bridge", help="bridge id (default: Switch's default Mattermost bridge)")
     ap.add_argument("--suffix", default="", help="append to every name (for repeated runs on one server)")
     args = ap.parse_args()
 
@@ -68,6 +112,20 @@ def main() -> None:
 
     STATE.mkdir(exist_ok=True)
     state: dict = {"switch_url": base, "suffix": sfx, "companies": {}}
+
+    bridge = args.mattermost_bridge
+    mm_admin = None
+    if args.mattermost or bridge:
+        if not bridge:
+            bridge = next((b["bridge_id"] for b in admin.bridges()
+                           if b.get("bridge_type") == "mattermost" and b.get("is_default")), None)
+            if not bridge:
+                sys.exit("no default Mattermost bridge on this Switch server")
+        mm_url = os.environ.get("MATTERMOST_URL", "http://localhost:8065")
+        mm_admin = Mattermost(mm_url)
+        mm_admin.login(os.environ["MATTERMOST_ADMIN_USER"], os.environ["MATTERMOST_ADMIN_PASSWORD"])
+        team = mm_admin.team(os.environ.get("MATTERMOST_TEAM_NAME", "switch"))
+        state["mattermost"] = {"url": mm_url, "team": team["name"], "bridge_id": bridge}
 
     # 1. Live data folders = investigator workspaces. Each holds only its own company's files.
     for co, meta in COMPANIES.items():
@@ -109,8 +167,16 @@ def main() -> None:
         state["companies"][co]["_gw"] = gw
         print(f"{meta['title']}: user {email}, agents {cname}, {iname}")
 
+        if mm_admin is not None:
+            username, mpw = f"{co}-eng{sfx}", mm_password()
+            mu = mm_admin.create_user(username, f"{co}-eng{sfx}@airlock.example.com", mpw,
+                                      meta["title"], "Engineer")
+            mm_admin.add_to_team(team["id"], mu["id"])
+            link_mattermost(gw, state["mattermost"]["url"], bridge, username, mpw, mu["id"])
+            state["companies"][co]["mattermost"] = {"username": username, "password": mpw, "user_id": mu["id"]}
+            print(f"{meta['title']}: Mattermost account {username}, linked to {email}")
+
     # 4. Rooms. Each company creates its own private room; the host creates airlock.
-    bridge = args.mattermost_bridge
     for co, meta in COMPANIES.items():
         c = state["companies"][co]
         gw = c["_gw"]
@@ -130,6 +196,26 @@ def main() -> None:
     for co in COMPANIES:
         admin.add_member(air["id"], state["companies"][co]["user"]["id"])
     state["airlock_room"] = air["id"]
+
+    if mm_admin is not None:
+        # Each engineer into their own channels; the bundled default member out
+        # of the private ones. Then check: who is in each channel.
+        default = mm_admin.user_by_username(os.environ.get("MATTERMOST_USER", "user"))
+        chans = {}
+        for co in COMPANIES:
+            c = state["companies"][co]
+            ch = mm_admin.channel(team["id"], channel_name(c["_gw"].room(c["private_room"])))
+            mm_admin.add_to_channel(ch["id"], c["mattermost"]["user_id"])
+            if any(m["user_id"] == default["id"] for m in mm_admin.members(ch["id"])):
+                mm_admin.remove_from_channel(ch["id"], default["id"])
+            chans[co] = ch
+        ch = mm_admin.channel(team["id"], channel_name(admin.room(air["id"])))
+        for co in COMPANIES:
+            mm_admin.add_to_channel(ch["id"], state["companies"][co]["mattermost"]["user_id"])
+        chans["airlock"] = ch
+        state["mattermost"]["channels"] = {k: {"id": v["id"], "name": v["name"]} for k, v in chans.items()}
+        for k, v in chans.items():
+            print(f"Mattermost channel {v['name']}: {len(mm_admin.members(v['id']))} members")
 
     # 5. Addressing policies, set by each owner. Customs answers its own people in
     # its room, anyone in airlock (so it can refuse visibly), and the peer Customs.
@@ -164,6 +250,15 @@ def main() -> None:
         AgentClient(base, c["agents"]["investigator"]["id"], c["agents"]["investigator"]["api_key"]).post(
             c["private_room"], f"airlock pairing {n}")
         nonces[n] = (co, "investigator")
+        if mm_admin is not None:
+            mm = Mattermost(state["mattermost"]["url"])
+            mm.login(c["mattermost"]["username"], c["mattermost"]["password"])
+            for key in (co, "airlock"):
+                n = secrets.token_hex(6)
+                mm.post(state["mattermost"]["channels"][key]["id"], f"airlock pairing {n}")
+                nonces[n] = (co, "engineer")
+            mm.logout()
+    time.sleep(3 if mm_admin is not None else 0)  # let the bridge deliver
     for co in COMPANIES:
         state["companies"][co]["participants"] = {"engineer": [], "customs": [], "investigator": []}
     for co in COMPANIES:
@@ -176,8 +271,12 @@ def main() -> None:
                     who = nonces.get(body.split()[-1])
                     if who:
                         ids = state["companies"][who[0]]["participants"][who[1]]
-                        if ev["sender"] not in ids:
-                            ids.append(ev["sender"])
+                        # The same rule Customs applies: a platform message speaks
+                        # for the person it names, everything else for its sender.
+                        sid = ev.get("on_behalf_of") if ev.get("sender_kind") == "platform" else None
+                        sid = sid or ev["sender"]
+                        if sid not in ids:
+                            ids.append(sid)
     for co in COMPANIES:
         for role, ids in state["companies"][co]["participants"].items():
             if not ids:

@@ -113,6 +113,7 @@ class Gateway:
         }
         if bridge_id:
             body["bridge_id"] = bridge_id
+            body["channel_type"] = "channel_private" if private else "channel_public"
         return _check(self.http.post("/rooms", json=body))
 
     def room(self, room_id: str) -> dict[str, Any]:
@@ -143,6 +144,30 @@ class Gateway:
 
     def messages(self, room_id: str) -> Any:
         return _check(self.http.get(f"/chats/{room_id}/messages"))
+
+    # -- messaging platforms (Mattermost) --------------------------------------
+
+    def bridges(self) -> list[dict[str, Any]]:
+        return _check(self.http.get("/collaborations"))
+
+    def directory(self, bridge_id: str, query: str) -> dict[str, Any]:
+        return _check(self.http.get(f"/collaborations/{bridge_id}/directory", params={"query": query}))
+
+    def claim_identity(self, bridge_id: str, external_user_id: str, username: str) -> dict[str, Any]:
+        """Start linking a platform account to this Switch user. It counts only
+        once the account confirms it (verify_identity)."""
+        return _check(self.http.post(f"/collaborations/{bridge_id}/identities", json={
+            "external_user_id": external_user_id, "username": username, "expects_confirmation": True,
+        }))
+
+    def verify_identity(self, bridge_id: str, identity_id: str, platform_token: str) -> Any:
+        """Confirm a waiting link with the platform account's own session."""
+        return _check(self.http.post(
+            f"/collaborations/{bridge_id}/identities/{identity_id}/verify-session",
+            json={"token": platform_token}))
+
+    def identities(self) -> list[dict[str, Any]]:
+        return _check(self.http.get("/auth/me/identities"))
 
 
 # ── Agent protocol ───────────────────────────────────────────────────────────

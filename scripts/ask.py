@@ -20,6 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from airlock.mattermost import Mattermost  # noqa: E402
 from airlock.switch_client import AgentClient, Gateway  # noqa: E402
 
 
@@ -30,6 +31,7 @@ def main() -> None:
     ap.add_argument("--room", choices=["private", "airlock"], default="private")
     ap.add_argument("--watch", type=float, default=90, help="seconds to keep printing replies")
     ap.add_argument("--until", help="stop once a message contains this text")
+    ap.add_argument("--mm", action="store_true", help="post from the engineer's Mattermost account")
     args = ap.parse_args()
 
     state = json.loads((ROOT / "state" / "airlock.json").read_text())
@@ -45,9 +47,16 @@ def main() -> None:
             if f"@{short}" in text:
                 text = text.replace(f"@{short}", f"@{a['name']}")
                 mention.append(a["id"])
-        gw = Gateway(state["switch_url"])
-        gw.login(c["user"]["email"], c["user"]["password"])
-        gw.post(room, text, mention_agent_ids=mention)
+        if args.mm:
+            mm = Mattermost(state["mattermost"]["url"])
+            mm.login(c["mattermost"]["username"], c["mattermost"]["password"])
+            key = args.company if args.room == "private" else "airlock"
+            mm.post(state["mattermost"]["channels"][key]["id"], text)
+            mm.logout()
+        else:
+            gw = Gateway(state["switch_url"])
+            gw.login(c["user"]["email"], c["user"]["password"])
+            gw.post(room, text, mention_agent_ids=mention)
 
     seen: set[str] = set()
     end = time.time() + args.watch
