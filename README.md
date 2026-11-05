@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="https://youtu.be/-LfhJHbl4Fk">Video</a> ·
   <a href="#see-it-one-live-run">See it</a> ·
   <a href="#why-switch-is-central">Why Switch</a> ·
   <a href="#run-it">Run it</a> ·
@@ -20,7 +21,10 @@ Each company investigates a shared production failure in its own private [Switch
 
 Built for [Flip the Switch](https://www.wemakedevs.org/hackathons/switch) (Best Business Workflow). It runs on Switch and Mattermost. Both companies are fictional, and all the data is synthetic.
 
-Demo video: _link added at submission_
+<p align="center">
+  <a href="https://youtu.be/-LfhJHbl4Fk"><img src="video/thumbnail/airlock-thumbnail.png" width="640" alt="Watch the demo video: 2 companies, 1 bug, 0 logs shared"></a>
+  <br><b><a href="https://youtu.be/-LfhJHbl4Fk">▶ Watch the 2½-minute demo on YouTube</a></b>
+</p>
 
 <p align="center">
   <img src="assets/screenshots/3-airlock-room.png" alt="The airlock channel in Mattermost: the two Customs bots post AIRLOCK/1 typed claims and PSI room documents">
@@ -295,6 +299,7 @@ What it does **not** protect against, plainly:
 - `httpx` and `pytest`.
 - The RFC 3526 group constants and the textbook DH-PSI construction.
 - Two optional dev conveniences: Switch's `just`/Docker setup, and a compose override that moves Postgres to port 5433.
+- For the video: [HyperFrames](https://hyperframes.heygen.com) and GSAP to render it, sound effects from Pixabay (Pixabay Content License), and the music track "Funkorama" by Kevin MacLeod ([incompetech.com](https://incompetech.com)), licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
 
 **Built during the event (Nov 4–7, 2026), all of this repository:**
 - [airlock/claims.py](airlock/claims.py): typed claim vocabulary and wire format.
@@ -308,8 +313,13 @@ What it does **not** protect against, plainly:
 - [scripts/e2e_live.py](scripts/e2e_live.py), [scripts/up.py](scripts/up.py), [scripts/ask.py](scripts/ask.py), [scripts/spike_isolation.py](scripts/spike_isolation.py).
 - The investigator rules in [agents/](agents/), the generated data in [data/](data/), and 90 tests in [tests/](tests/).
 - The logo and screenshots in [assets/](assets/).
+- The demo video in [video/](video/): 12 animated scenes written as HTML, the sound design, and the thumbnail. Its Mattermost scenes are rebuilt from the live run's real messages.
 
 Built with Claude Code as a pair programmer. Commit history is in this repo.
+
+## Credits
+
+Music in the demo video: "Funkorama" by Kevin MacLeod ([incompetech.com](https://incompetech.com)), licensed under [Creative Commons: By Attribution 3.0](https://creativecommons.org/licenses/by/3.0/). Sound effects: [Pixabay](https://pixabay.com/sound-effects/), Pixabay Content License. Full list in [video/CREDITS.md](video/CREDITS.md).
 
 ## Layout
 
@@ -321,5 +331,6 @@ scripts/      setup, e2e_live, up, ask, spike_isolation
 tests/        offline tests
 assets/       logo/ (the door, PNGs, social preview) and screenshots/ (one live run)
 docs/         BRIEF.md (design brief), DEMO.md (video script), BLOG.md (blog draft)
+video/        the demo video: HyperFrames scenes, sound, thumbnail (rebuild with: npx hyperframes render)
 state/        created at runtime: credentials and each company's live folder (gitignored)
 ```
