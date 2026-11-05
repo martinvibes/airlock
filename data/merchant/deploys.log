@@ -1,0 +1,2 @@
+2026-11-02T14:05:00Z service=checkout-web version=v5.2.0 target=all strategy=rolling
+2026-11-03T09:12:00Z service=webhook-verifier version=v2.14.0 target=pod-canary-1 strategy=canary weight=10% note=verify_X-Sig-Primary_only_legacy_header_fallback_removed

@@ -1,0 +1,17 @@
+{
+  "merchant": "kudimart",
+  "rotated_at": "2026-11-03T09:40:00Z",
+  "overlap_until": "2026-11-06T09:40:00Z",
+  "headers": {
+    "X-Sig-Primary": {
+      "key_id": "whsec-2026-11",
+      "secret": "6aeb7d3a18615835afbab6d1de5bd057352f2663a01b7c0252489c80de54ef07"
+    },
+    "X-Sig-Secondary": {
+      "key_id": "whsec-2026-08",
+      "secret": "f065939ecfeb09e65adfc77f7801a4a9589c4448b8743c942868e89fefa22c4f"
+    }
+  },
+  "max_attempts": 3,
+  "note": "synthetic secrets for a fictional demo"
+}

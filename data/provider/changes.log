@@ -1,0 +1,4 @@
+2026-11-02T16:20:00Z change=fraud_rules_updated scope=all_merchants detail=velocity_threshold_raised
+2026-11-03T09:40:00Z change=signing_secret_rotated merchant=kudimart new_key=whsec-2026-11 old_key=whsec-2026-08
+2026-11-03T09:40:00Z change=secret_overlap_window_opened merchant=kudimart overlap_until=2026-11-06T09:40:00Z X-Sig-Primary=whsec-2026-11 X-Sig-Secondary=whsec-2026-08
+2026-11-03T11:30:00Z change=dashboard_deployed version=v8.3.0 scope=internal

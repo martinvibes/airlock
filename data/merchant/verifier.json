@@ -1,0 +1,34 @@
+{
+  "secret": {
+    "key_id": "whsec-2026-08",
+    "value": "f065939ecfeb09e65adfc77f7801a4a9589c4448b8743c942868e89fefa22c4f",
+    "installed_at": "2026-08-14T10:00:00Z"
+  },
+  "pods": {
+    "pod-1": "v2.13.2",
+    "pod-2": "v2.13.2",
+    "pod-3": "v2.13.2",
+    "pod-4": "v2.13.2",
+    "pod-5": "v2.13.2",
+    "pod-6": "v2.13.2",
+    "pod-7": "v2.13.2",
+    "pod-8": "v2.13.2",
+    "pod-9": "v2.13.2",
+    "pod-canary-1": "v2.14.0"
+  },
+  "versions": {
+    "v2.13.2": {
+      "accepted_headers": [
+        "X-Sig-Primary",
+        "X-Sig-Secondary"
+      ]
+    },
+    "v2.14.0": {
+      "accepted_headers": [
+        "X-Sig-Primary"
+      ]
+    }
+  },
+  "routing": "sha256(reference) mod 10 picks the pod; retries go to the same pod",
+  "note": "synthetic secret for a fictional demo"
+}
