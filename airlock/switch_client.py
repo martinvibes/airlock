@@ -185,6 +185,33 @@ def register_agent(
     return data["id"], data["api_key"]
 
 
+def register_known(
+    base_url: str,
+    registration_key: str,
+    agent_type: str,
+    name: str,
+    description: str,
+    *,
+    display_name: str | None = None,
+    options: dict[str, Any] | None = None,
+) -> tuple[str, str]:
+    """Register one of Switch's known agent types, e.g. "claude-code"."""
+    resp = httpx.post(
+        base_url.rstrip("/") + "/agents/register-known",
+        headers={"Authorization": f"Bearer {registration_key}"},
+        json={
+            "agent_type": agent_type,
+            "name": name,
+            "description": description,
+            "display_name": display_name,
+            "options": options or {},
+        },
+        timeout=30,
+    )
+    data = _check(resp)
+    return data["id"], data["api_key"]
+
+
 @dataclass
 class Event:
     type: str
@@ -231,17 +258,21 @@ class AgentClient:
     def ops(self) -> dict[str, Any]:
         return _check(self.http.get(f"/agents/{self.agent_id}/ops"))["operations"]
 
-    def op(self, name: str, connection_id: str | None = None, **args: Any) -> Any:
-        headers = {}
-        cid = connection_id or self.connection_id
-        if cid:
-            headers["X-Switch-Connection-Id"] = cid
+    def op(self, _op: str, _connection_id: str | None = None, **args: Any) -> Any:
+        """Call an operation. Arguments go unwrapped in the body; the
+        connection id header binds the call to the room that connection holds."""
+        headers = {"X-Switch-Connection-Id": _connection_id or self.connection_id}
         return _check(
-            self.http.post(f"/agents/{self.agent_id}/ops/{name}", json=args, headers=headers)
+            self.http.post(f"/agents/{self.agent_id}/ops/{_op}", json=args, headers=headers)
         )["result"]
 
-    def history(self, room_id: str) -> Any:
-        return _check(self.http.get(f"/agents/{self.agent_id}/rooms/{room_id}/history"))
+    def history(self, room_id: str, limit: int = 50, since: str | None = None) -> Any:
+        params: dict[str, Any] = {"limit": limit}
+        if since:
+            params["since"] = since
+        return _check(
+            self.http.get(f"/agents/{self.agent_id}/rooms/{room_id}/history", params=params)
+        )
 
     # -- stream ---------------------------------------------------------------
 

@@ -288,6 +288,8 @@ class Customs:
         if msg.sender in self.cfg.peer_ids:
             if msg.body.startswith("REFUSED"):
                 return  # never answer a refusal; no loops
+            if not msg.body.startswith(claims.WIRE_PREFIX) and not self._addressed(msg):
+                return  # e.g. Switch's join greeting posted as the peer
             try:
                 claim = claims.decode(msg.body, sent_by=self.cfg.peer_party)
             except ClaimError as e:

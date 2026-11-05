@@ -192,8 +192,8 @@ def generate(out: Path) -> dict[str, int]:
     (merch / "app.log").write_text("\n".join(line for _, line in sorted(app)) + "\n")
     (prov / "changes.log").write_text(
         "2026-11-02T16:20:00Z change=fraud_rules_updated scope=all_merchants detail=velocity_threshold_raised\n"
-        f"{ts(ROTATION)} change=signing_secret_rotated merchant=kudimart new_key={NEW_KEY_ID} old_key={OLD_KEY_ID}\n"
-        f"{ts(ROTATION)} change=secret_overlap_window_opened merchant=kudimart "
+        f"{ts(ROTATION)} change=signing_secret_rotated service=webhook-signer version=v4.1.0 merchant=kudimart new_key={NEW_KEY_ID} old_key={OLD_KEY_ID}\n"
+        f"{ts(ROTATION)} change=secret_overlap_window_opened service=webhook-signer version=v4.1.0 merchant=kudimart "
         f"overlap_until={ts(ROTATION + timedelta(hours=72))} X-Sig-Primary={NEW_KEY_ID} X-Sig-Secondary={OLD_KEY_ID}\n"
         "2026-11-03T11:30:00Z change=dashboard_deployed version=v8.3.0 scope=internal\n"
     )
